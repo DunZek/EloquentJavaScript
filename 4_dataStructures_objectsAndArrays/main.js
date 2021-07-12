@@ -40,8 +40,8 @@ Object.assign(objectA, {b: 3, c: 4})
 console.log(objectA)  // ... {a: 1, b: 3, c: 4}
 
 // Arrays/lists are revealed to just be another kind of object
-list = ["Hello", "World"]  // ...list
-console.log(typeof list)
+list = ["Hello", "World"]
+console.log(typeof list)  // ...object
 
 // Weresquirrel: objects
 let journal = [
@@ -237,7 +237,7 @@ console.log(max(4, 1, 9, -2))  // ...9
 
 // To pass all the elements of an array, use the three-dot notation as well
 let numbers = [5, 1, 7]
-console.log(max(...numbers))  // <- Note: this ends up passing all the elements as seperate arguments desire by consequence
+console.log(max(...numbers))  // <- Note: this ends up passing all the elements as seperate arguments desired by consequence
 
 // The three-dot notation can also be used in forming arrays
 words = ["never", "fully"]
@@ -249,7 +249,7 @@ console.log(["will", ...words, "understand"])
     - Objects are used as namespaces for functions and values so that the global namespace isn't polluted, reducing programmer mistakes.
 */
 
-// While it is illegal to reclare values and functions initiated with 'let' and 'const', JavaScript ignores the following:
+// While it is illegal to redeclare values and functions initiated with 'let' and 'const', JavaScript ignores the following:
 var binding = 0
 var binding = 0
 function my_func() {return}
@@ -285,7 +285,7 @@ console.log(name, age)
 */
 
 // JSON.stringify() - return a JSON-encoded string from a JavaScript object
-let string = JSON.stringify({squirrel: false, events: ["weekend"]})
+string = JSON.stringify({squirrel: false, events: ["weekend"]})
 console.log(string)  // <- {"squirrel":false,"events":["weekend"]}
 
 // JSON.parse() - return a JavaScript object from a JSON-encoded string
