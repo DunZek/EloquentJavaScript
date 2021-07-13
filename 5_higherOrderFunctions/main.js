@@ -52,3 +52,4 @@ repeat(3, n => {
 ['A', 'B'].forEach(element => console.log(element))  // ...A B
 
 /* Script Data Set */
+require('./05_higher_order/code/scripts')
