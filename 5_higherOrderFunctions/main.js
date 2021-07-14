@@ -84,9 +84,9 @@ console.log(map(filter(SCRIPTS, script => script.direction == "rtl"), script => 
 
 /* Summarizing with Reduce */
 // higher-order array method used for computation. Sometimes called 'fold'
-function reduce(array, combine, start){
+function reduce(array, combine, starting_current){
 // ^^ the standard method meanwhile doesn't require the "start" argument if '0' is assumed (???)
-    let current = start
+    let current = start_current
     for (let element of array) current = combine(current, element)
     return current
 }
@@ -193,8 +193,12 @@ console.log(textScripts('英国的狗说"woof", 俄罗斯的狗说"тяв"'))
         - Array.filter() -> returns a new array containing only the elements that pass the predicate function
         - Array.map() -> returns an array containing elements returned by the predicate function
         - Array.reduce() -> returns a value as the computational result of the elements of the given array
-        - Array.some() -> returns true whether any element in the given array passes the predicate function
-            - else false
+        - Array.some() -> returns true whether an element in the given array passes the predicate function
+            - else return false
         - Array.findIndex() -> returns the index of the first element that passes the predicate function
             - else -1
+    
+    - Extra:
+        -Array.every() -> returns false whether an element in the given array does NOT pass the predicate function
+            - else return true
 */
