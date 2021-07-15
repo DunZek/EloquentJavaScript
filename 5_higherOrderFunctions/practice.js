@@ -50,3 +50,45 @@ for (let parrot of parrots){
 let forEach = (array, predicate) => { for (let element of array) predicate(element) }  // implementation
 forEach(parrots, parrot => console.log(parrot.name))  // invocation
 parrots.forEach(parrot => console.log(`Parrot ${parrot.name} is ${parrot.age} old.`))  // invocation of the actual method
+
+/* Script Data Set
+require('./05_higher_order/code/scripts')
+
+/* Filtering Arrays */
+function filter(array, predicate){
+    let passed = []
+    for (let element of array) if (predicate(element)) passed.push(element)
+    return passed
+}
+
+// console.log(filter(SCRIPTS, script => script.living))
+// console.log(SCRIPTS.filter(script => script.living))  // use method notation
+
+/* Transforming With Map */
+function map(array, predicate){
+    let mapped = []
+    for (let element of array) mapped.push(predicate(element))
+    return mapped
+}
+
+console.log([1, 2, 3, 4, 5].map(number => number - 1))
+
+/* Summarizing With Reduce */
+function reduce(array, predicate, start_element){
+    let current_element = start_element
+    for (let element of array) current = predicate(current_element, element)
+    return current_element
+}
+
+console.log([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].reduce((current, element) => current + element))  // 55
+
+// Demonstration - finding the script with the most characters
+let characterCount = script => script.ranges.reduce((count, [from, to]) => count + (to - from), 0)
+// console.log(SCRIPTS.reduce((current, element) => characterCount(current) > characterCount(element) ? current : element))
+
+/* Composability */
+// for loop
+let biggest = null
+for (let script of SCRIPTS) if (biggest == null || characterCount(script) > characterCount(biggest)) biggest = script
+console.log(biggest.name)
+// higher-order array methods

@@ -14,9 +14,13 @@ parrot.squawk = line => console.log(`${this.name} parrot squawks "${line}"`)
 parrot.squawk("You're nearing the end!")
 // ^^ Arrow functions don't work
 
-// Example 3 - Arrow function scope
-parrot.currentAge = 20
-parrot.birthYear = 2000
+// Example 3 - Arrow function scope ???
+let object = {coords: [0, 2, 3], length: 5}
+function normalize(){ console.log(this.coords.map(n => n / this.length)) }  // arrow functions
+normalize.call(object)
 
-function identify(){ console.log(this.name) }  // arrow functions
-identify.call(parrot)
+/* Prototypes */
+let empty = {}
+console.log(empty.toString)
+console.log(empty.toString())
+// ^^ return the appropriate prototype for the missing property
