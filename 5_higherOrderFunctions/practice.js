@@ -32,6 +32,21 @@ function log(predicate){
     }
 }
 
-log(Math.min)(1, 2, 3)
+log(Math.min)(1, 2, 3)  // declare and invoke
 
 // Demonstration - a function that introduces new control flow
+let parrots = [
+    {name: "Terry", age: 20},
+    {name: "Puffy", age: 10},
+    {name: "Gilbert", age: 30},
+    {name: "Pickette", age: 8}
+]
+function unless(test, then){ if (test) then() }
+for (let parrot of parrots){
+    unless(parrot.age < 15, () => console.log(`Parrot ${parrot.name} is young`))
+}
+
+// Array.forEach()
+let forEach = (array, predicate) => { for (let element of array) predicate(element) }  // implementation
+forEach(parrots, parrot => console.log(parrot.name))  // invocation
+parrots.forEach(parrot => console.log(`Parrot ${parrot.name} is ${parrot.age} old.`))  // invocation of the actual method
