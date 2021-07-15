@@ -15,5 +15,8 @@ parrot.squawk("You're nearing the end!")
 // ^^ Arrow functions don't work
 
 // Example 3 - Arrow function scope
-function normalize(){ console.log(this.coords.map(n => n / this.length)) }
-normalize.call( {coords: [0, 2, 3], length: 5} )
+parrot.currentAge = 20
+parrot.birthYear = 2000
+
+function identify(){ console.log(this.name) }  // arrow functions
+identify.call(parrot)

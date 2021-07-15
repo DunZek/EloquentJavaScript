@@ -16,17 +16,22 @@ let numbers = []
 repeat(10, i => numbers.push(i+1))  // <- invoking a higher-order array function using the convention
 
 /* Higher-Order Functions */
-// Demonstration - creating other Functions
+// Demonstration - a function that creates other Functions
 function multiplyBy_proto(n) { return m => m * n }  // return a single-parameter function
 let multiplyBy10 = multiplyBy_proto(10)  // return arg * 10
 // -> let multiplyBy10 = m => m * 10
-console.log(multiplyBy10(2))
+// console.log(multiplyBy10(2))
 
-// Demonstration
-function noisy(f){
+// Demonstration - a function that changes other functions
+function log(predicate){
     return (...args) => {
-        console.log("calling with", args)
+        console.log("Calling with", args)
+        let result = predicate(...args)
+        console.log("Calling with", args, ", resulting in", result)
+        return result
     }
 }
 
-noisy(Math.min)(3, 2, 1)
+log(Math.min)(1, 2, 3)
+
+// Demonstration - a function that introduces new control flow
