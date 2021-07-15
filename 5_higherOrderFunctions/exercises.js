@@ -1,3 +1,5 @@
+const SCRIPTS = require('./05_higher_order/code/scripts')
+
 /* Flattening - Array.reduce(), Array.concat() */
 let flattenArray = array => array.reduce((current, element) => [].concat(current, element))
 
@@ -63,76 +65,37 @@ function characterScript(code){
 }
 
 // Return an array of objects with "name" and "count" properties
-function countBy(items, groupName){
-    let counts = []
-    for (let item of items){
-        let name = groupName(item)
-        let known = counts.findIndex(c => c.name == name)
-        if (known == -1) counts.push({name, count: 1})
-        else counts[known].count++
+function countBy(iterable, groupName){
+    let objectArray = []
+    for (let element of iterable){
+        let name = groupName(element)
+        let knownIndex = objectArray.findIndex(object => object.name == name)
+        if (knownIndex == -1) objectArray.push({name, count: 1})
+        else objectArray[knownIndex].count++
     }
-    return counts
+    return objectArray
 }
 
 // 1. received input: String -> text
 function dominantDirection(text){
-    // 2. instantiated: Array -> character codes of each character in the text-string
-    let textCharacterCodes = []
-    for (char in text){
-        textCharacterCodes.push(char.charCodeAt(0))
-    }
-    console.log(textCharacterCodes)
+    // Step 1 - Obtain the count and the name of the scripts used in text
+    let scripts = countBy(text, char => {
+        let script = characterScript(char.codePointAt(0))
+        return script ? script.name : "none"
+    }).filter(script => script.name != 'none')
 
-    // 4. returned: String -> the string of the object whose character count is the highest amongst the rest
-    let direction = scripts => {
-        let max = 0
-        for (let script of scripts){
-            if (script.count > max) max = script.count
-        }
-        for (let script of scripts){
-            
-        }
-    }
-    return direction
+    // Step 2 - Attach the direction value that pertains to the script's direction value from SCRIPTS
+    scripts = scripts.map(object => {
+        let direction = "NOT FOUND"
+        for (let script of SCRIPTS) if (object.name == script.name) direction = script.direction
+        return {name: object.name, direction: direction, count: object.count}
+    })
 
-    // Return the direction of the "script" with the highest "count"
-    // return scripts.reduce((current, script) => current.count > script.count ? current : script).direction
+    // Step 3 - Return the direction value of the script with the highest count value
+    return scripts.reduce((biggest_script, a_script) => biggest_script > a_script ? biggest_script : a_script).direction
 }
 
 console.log(dominantDirection("Hello!"))  // ...ltr
-// console.log(dominantDirection("Hey, مساء الخير"))  // ...rtl
+console.log(dominantDirection("Hey, مساء الخير"))  // ...rtl
 
-/* Flow (Pseudo-code)
-    1. received input: String -> text
-
-    2. instantiated: Array -> character codes of each character in the text-string
-        - input: String -> text
-        -   "let textCharacterCodes = []"
-        -   "for each char in string"
-        -       "textCharacterCodes.push(charCodeAt(char))"
-        - output: Array -> textCharacterCodes
-
-    3. instantiated: Array -> objects consisting of "name", "direction", and "text character count" properties
-        - input: Array -> text character codes
-        -   "let scripts = []"
-        -   "for each character code"
-        -       "if it pertains to an existing script, "
-        -
-        -
-        - "for each code, "
-        - output: Array -> scripts {name, direction, count}
-
-    4. returned: String -> the string of the object whose character count is the highest amongst the rest
-        - input: Array -> scripts {name, direction, count}
-        -   "let total = 0"
-        -   "for each script"
-        -       "total is total if script.count is smaller than total, else reinstantiate total as the script.count"
-        -   "for each script"
-        -       "if script.count matches total, return script.direction"
-        - output: String -> direction
-*/
-scripts = [
-    {name: "Script A", direction: "ltr", count: 10},
-    {name: "Script B", direction: "rtl", count: 20},
-    {name: "Script C", direction: "ttb", count: 15}
-]
+// console.log([1, 2, 3, 4, 5].reduce((num_a, num_b) => num_a > num_b ? num_a : num_b))

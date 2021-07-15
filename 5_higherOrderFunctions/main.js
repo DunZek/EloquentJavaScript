@@ -166,7 +166,7 @@ function countBy(items, groupName){  // (array, predicate)
 console.log(countBy([1, 2, 3, 4, 5], n => n > 2))  // <- in this example, the iterable is an array of numbers
 // ^^ [{name: false, count: 2}, {name: true, count: 3}]
 
-// Demosntration - using countBy() to return an array of scripts used in a given piece of text
+// Demonstration - using countBy() to return an array of scripts used in a given piece of text
 function textScripts(text){
     let scripts = countBy(text, char => {
         let script = characterScript(char.codePointAt(0))
@@ -182,7 +182,7 @@ function textScripts(text){
     }).join(", ")
 }
 
-console.log(textScripts('英国的狗说"woof", 俄罗斯的狗说"тяв"'))
+console.log(textScripts("Hello!"))
 
 /* Summary 
     - Higher-order array methods allows functions to exist that uses other, predicate functions to model
