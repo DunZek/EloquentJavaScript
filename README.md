@@ -10,3 +10,5 @@ Important chapters to look back on:
 
 - Chapter 1: Short-circuiting of Logical Operators
 - Chapter 3: Functions -> Recursion
+- Chapter 5
+- Chapter 6
