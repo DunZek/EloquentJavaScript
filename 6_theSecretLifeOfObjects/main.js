@@ -351,15 +351,28 @@ console.log(Math.max(5, 7))
 /* Inheritance
     - JavaScript's prototype system allows new classes to be created from old classes, where new definitions can be added
         - This is called "inheritance", where new classes can be created which inherit the properties and behaviors of old classes
+    - These three form the fundamentals of object-oriented programming
+        - Encapsulation - bundling common properties and methods into a single object (i.e. a class)
+        - Polymorphism - using different things with the same interface
+        - Inheritance - that which allows us to build new datatypes from previous ones.
+
+    - However, it is a controversial concept and feature in JavaScript because of the complexity it creates. It's best to use it only if necessary
 */
 // Some matrices are defined to be symmetrical from top-left to bottom-right. Such use-case will be used to exemplify inheritance
-class SymmetricMatrix extends Matrix{
+class SymmetricMatrix extends Matrix{  // "extend" keyword dictates that the subclass should derive from the superclass that isn't Object.prototype
     constructor(size, element = (x, y) => undefined){
-        super(size, size, (x, y) => {
-            if (x < y)
+        super(size, size, (x, y) => {  // "super" keyword enables the subclass to instantiate by invoking the constructor of its superclass
+            if (x < y) return element(y, x)
+            else return element(x, y)
         })
     }
+
+    set(x, y, value){
+        super.set(x, y, value)  // the "super" keyword here is used to invoke the superclass' own .set() method. But we will be redefining it
+        if (x != y) super.set(y, x, value)
+    }
 }
+// ^^ as exemplified, the "super" keyword allows subclasses to refer and invoke superclass properties while in their own scope
 
 matrix = new SymmetricMatrix(5, (x, y) => `${x}, ${y}`)
 console.log(matrix.get(2, 3))
