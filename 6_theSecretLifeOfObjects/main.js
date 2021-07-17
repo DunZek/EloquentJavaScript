@@ -230,8 +230,138 @@ stringObject[logSymbol]("Hello World")  // Hello World
 // ^^ we use the bracket-index notation to access the particular binding and to also declare it in the first place
 
 /* The Iterator Interface
-    - Objects passed to for/of loops are expected to be iterable.
-        - These objects therefore have a method named with the Symbol.iterator symbol
-            - A symbol value defined by JavaScript to be stored as a property of the Symbol function
-    - 
+    - Iterable objects possess a method named with the "Symbol.iterator" symbol
+    - The object method provides the "iterator" interface which does the iterating.
+    - The iterator then has a "next" method which returns the next result for the next iteration.
+    - This result is an object with a "value" property which provides the next value.
+    - This object also has a "done" property to indicate whether there are no more results (true), else false
+
+    - "next", "value", "done" property names are all strings.
+        - Only "Symbol.iterator" is a symbol
 */
+// Using the iterator interface
+let okIterator = "OK"[Symbol.iterator]()  // <- invocation upon a string -> return iterator interface
+let arrIterator = [1, 2, 3, 4, 5][Symbol.iterator]()  // <- ditto example: invocation upon an array
+console.log(okIterator.next())  // <- returns an object and iterates
+console.log(okIterator.next())  // <- ditto
+console.log(okIterator.next())  // finally the value is undefined and it is done
+
+// Example -> implementing an iterable data-structure
+class Matrix {
+    constructor(width, height, element = (x, y) => undefined){
+        this.width = width
+        this.height = height
+        this.content = []
+
+        for (let y=0; y < height; y++){
+            for (let x=0; x < width; x++){
+                this.content[y * width + x] = element(x, y)
+            }
+        }
+    }
+
+    get(x, y){
+        return this.content[y * this.width + x]
+    }
+    set(x, y, value){
+        this.content[y * this.width + x] = value
+    }
+}
+
+// Our own iterator interface for our own object
+class MatrixIterator {
+    constructor(matrix){
+        this.x = 0
+        this.y = 0
+        this.matrix = matrix
+    }
+    // The construction of the Object[Symbol.iterator]().next() method
+    next(){
+        // Handle case when iterable finishes, else proceed
+        if (this.y == this.matrix.height) return {done: true}
+
+        // Define value that the .next() method returns
+        let value = {x: this.x, y: this.y, value: this.matrix.get(this.x, this.y)}
+
+        // Iterate over to the next element
+        this.x++
+        // When the end has been reached actually, iterate to the next row and equate to the first index
+        if (this.x == this.matrix.width){
+            this.x = 0,
+            this.y++
+        }
+
+        return {value, done: false}
+    }
+}
+
+// Define the iterator interface for our particular object. This finally enables the Matrix object to be an iterable data-structure.
+Matrix.prototype[Symbol.iterator] = function(){
+    return new MatrixIterator(this)  // remember that the constructor function can only be invoked by using the "new" keyword
+}
+
+// With the iterator interface defined, loops can now interface with our Matrix object as it is now an official iterable
+let matrix = new Matrix(5, 5, (x, y) => `value ${x}, ${y}`)
+for (let {x, y, value} of matrix){
+    console.log(value)  // "x" position, then "y" position
+}
+
+/* Getters, Setters, and Statics
+    - While interfaces mostly consist of methods, it is acceptable to include non-function properties as well
+        - Map objects should have a size property which holds the number of keys stored
+    - "getters" methods which return property values when invoked.
+        - Instances may invoke "getters" when a particular non-function property is called
+*/
+// Demonstrating differences
+let varyingSize = {
+    get size(){ return Math.round(Math.random() * 100) },  // <- the "get" keyword is used to define getters for particular properties
+    getSize(){ return Math.round(Math.random() * 100) }  //
+}
+console.log(varyingSize.size)  // so, you may omit invocation notation
+console.log(varyingSize.getSize())  // otherwise you will have to
+
+// Setters
+class Temperature {
+    constructor(celsius){
+        this.celsius = celsius
+    }
+    get fahrenheit(){
+        return this.celsius * (9/5) + 32
+    }
+    set fahrenheit(value){
+        this.celsius = (value - 32) / (9/5)
+    }
+    // the "static" keyword allows the methods it prefixes to be accessible and usable by invoking them via the class
+    // Consequentially, this stores the static method into the constructor (???)
+    static fromFahrenheit(value){
+        return new Temperature((value - 32) / (9/5))  // instances may be initialized as consequence
+    }
+
+}
+
+let myThermometer = new Temperature(22)
+console.log(myThermometer.fahrenheit)  // using "getter"
+myThermometer.fahrenheit = 100  // using "setter"
+console.log(myThermometer.celsius)  // retrieving a property
+console.log(Temperature.fromFahrenheit(100))  // Accessing a prototype
+
+// Example of using a static method -> using namespace classes
+console.log(Math.max(5, 7))
+
+/* Inheritance
+    - JavaScript's prototype system allows new classes to be created from old classes, where new definitions can be added
+        - This is called "inheritance", where new classes can be created which inherit the properties and behaviors of old classes
+*/
+// Some matrices are defined to be symmetrical from top-left to bottom-right. Such use-case will be used to exemplify inheritance
+class SymmetricMatrix extends Matrix{
+    constructor(size, element = (x, y) => undefined){
+        super(size, size, (x, y) => {
+            if (x < y)
+        })
+    }
+}
+
+matrix = new SymmetricMatrix(5, (x, y) => `${x}, ${y}`)
+console.log(matrix.get(2, 3))
+
+/* The InstanceOf Operator */
