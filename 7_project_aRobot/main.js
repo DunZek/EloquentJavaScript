@@ -12,35 +12,54 @@ const roads = [
     "Marketplace-Town Hall", "Shop-Town Hall"
 ]
 // Creating a data-structure from graph data ("roads" in this case) that tells us, per point, which point is accessed via line
-let container = roads.map(road => road.split('-'))
-console.log(container)
-// Add first as a point
-// Add as part of the destination array
-/*
-    Call stack:
-    1 -> "Alice's House-Bob's House"
-    2 -> "Alice's House-Cabin"
-    3 -> "Alice's House-Post Office"
-    4 -> Bob's House-Town Hall
+function buildGraph(edges){
+    let container = edges.map(road => road.split('-'))
+    let forReturn = Object.create(null)
+    container.forEach(([pointA, pointB]) => {
+        // Declare object in array if not done yet, Push data in if not in yet
+        if (!(pointA in forReturn)) forReturn[pointA] = [pointB]
+        if (!forReturn[pointA].includes(pointB)) forReturn[pointA].push(pointB)
 
-    Result:
-    1st iteration:
-        {
-            "Alice's House": ["Bob's House"],
-            "Bob's House": ["Alice's House"]
-        }
-    2nd iteration:
-        {
-            "Alice's House": ["Bob's House", "Cabin"],
-            "Bob's House": ["Alice's House"],
-            "Cabin": ["Alice's House"]
-        }
-    3rd iteration:
-        {
-            "Alice's House": ["Bob's House", "Cabin", "Post Office"],
-            "Bob's House": ["Alice's House"],
-            "Cabin": ["Alice's House"],
-            "Post Office": ["Alice's House"]
-        }
+        // Declare object in array if not done yet, Push data in if not in yet
+        if (!(pointB in forReturn)) forReturn[pointB] = [pointA]
+        if (!forReturn[pointB].includes(pointA)) forReturn[pointB].push(pointA)
+    })
+    return forReturn
+}
+let roadGraph = buildGraph(roads)
+console.log(roadGraph)
 
+
+/* The Task
+    - The robot delivers a package from the place to their destination
+*/
+
+class VillageState {
+    constructor(place, parcels) {
+        this.place
+        this.parcels
+    }
+    move(destination) {
+        if (!roadGraph[this.place].includes(destination)) return this
+
+        let parcels = this.parcels.map(parcel => {
+            if (parcel.place != this.place) return parcel
+            return {place: destination, address: parcel.address}
+        }).filter(parcel => parcel.place != parcel.address)
+        return new VillageState(destination, parcels)
+    }
+}
+
+let first = new VillageState(
+    "Post Office",
+    [{place: "Post Office", address: "Alice's House"}]
+)
+let next = first.move("Alice's House")
+console.log(next.place)  // Alice's House
+console.log(next.parcel)  // []
+console.log(first.place)  // Post Office
+
+/* Persistent Data
+    - "Immutable" - the incapacity to change
+    - In JavaScript, not a lot of things are immutable like strings and numbers
 */
