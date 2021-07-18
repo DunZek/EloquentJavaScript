@@ -14,3 +14,33 @@ const roads = [
 // Creating a data-structure from graph data ("roads" in this case) that tells us, per point, which point is accessed via line
 let container = roads.map(road => road.split('-'))
 console.log(container)
+// Add first as a point
+// Add as part of the destination array
+/*
+    Call stack:
+    1 -> "Alice's House-Bob's House"
+    2 -> "Alice's House-Cabin"
+    3 -> "Alice's House-Post Office"
+    4 -> Bob's House-Town Hall
+
+    Result:
+    1st iteration:
+        {
+            "Alice's House": ["Bob's House"],
+            "Bob's House": ["Alice's House"]
+        }
+    2nd iteration:
+        {
+            "Alice's House": ["Bob's House", "Cabin"],
+            "Bob's House": ["Alice's House"],
+            "Cabin": ["Alice's House"]
+        }
+    3rd iteration:
+        {
+            "Alice's House": ["Bob's House", "Cabin", "Post Office"],
+            "Bob's House": ["Alice's House"],
+            "Cabin": ["Alice's House"],
+            "Post Office": ["Alice's House"]
+        }
+
+*/
