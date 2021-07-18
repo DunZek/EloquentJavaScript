@@ -377,4 +377,36 @@ class SymmetricMatrix extends Matrix{  // "extend" keyword dictates that the sub
 matrix = new SymmetricMatrix(5, (x, y) => `${x}, ${y}`)
 console.log(matrix.get(2, 3))
 
-/* The InstanceOf Operator */
+/* The instanceof Operator
+    - "instanceof" a binary operator implemented in JavaScript used to return a Boolean on whether an object was derived from a specific class
+*/
+console.log(new SymmetricMatrix(2) instanceof SymmetricMatrix)  // true <- an actual instance of this class
+console.log(new SymmetricMatrix(2) instanceof Matrix)  // true <- an instance of the subclass of this superclass
+console.log(new Matrix(2, 2) instanceof SymmetricMatrix)  // false <- as it should be
+console.log([1] instanceof Array)  // true <- the binary operator can also be applied to standard constructors such as Array
+console.log("Hello World" instanceof String)  // false <- (???)
+console.log(10 instanceof Number)  // false <- (???)
+console.log({key: "value"} instanceof Object)  // true <- almost every object is an instance of Object
+function myFunc() { return }
+console.log(myFunc instanceof Function)  // true
+
+/* Summary
+    1. The "Object" datatype do more than just hold methods and properties. They have prototypes, which are themselves objects.
+    2. objects will invisibly inherit their prototype's properties.
+    3. Simple objects have "Object.prototype" as their prototype.
+    4. Constructors are functions whose names start with a capital letter. They are used with the "new" operator to create new objects.
+        - The prototype belonging to an instance of a constructor function will be the object found in the "prototype" property of the constructor.
+    5. You can place all the properties that all values of a given type should share into their prototype.
+    6. The "class" notation can be used to define prototypes and constructors in one succinct manner.
+    7. "Getters" and "Setters" may be defined and used to invisibly compute or define an object's / class-instance's property.
+    8. Methods defined with the "static" prefix are called "Static methods". They are stored in the class' constructor rather than the prototype
+    and can be thus accessed as a property of the class instead of a particular instance.
+    9. The "instanceof" operator can used given an object and a constructor to tell whether an object is an instance of that contstructor
+
+    10. To "encapsulate" in OOP, define the particular interface for your objects that code can communicate with.
+        - This hides private properties and keeps public properties
+    11. Different datatypes may be implementing the same interface. Code may then use this interface to interface with these multiple datatypes.
+        - This is called "Polymorphism"
+    12. One may define the subclasses of a class when implementing multiple classes in their code if these subclasses do not differ in essence.
+        - The feature of iInheritance" allows subclasses to inherit the properties and methods of parent-classes.
+*/
