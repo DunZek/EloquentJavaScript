@@ -70,6 +70,12 @@ test("don't convert case-less characters", () => "مرحبا".toUpperCase() == "
 
 /* Debugging
     - Often on complicated programs, error logs often only point to the start of the problem and do not identify the entire problem itself
+    - When a bug and thus problem is identified:
+        - Don't immediately start solving. Analyze first why this error has ocurred.
+        - Produce observations that tests out your theories.
+            - Strategically call console.log() in the program
+            - With access to a browser, use its debugging capabilities. Use a "debugger":
+                - Setting up "breakpoints" on specific parts of code will pause execution and enable one to inspect bindings
 */
 // Example - a program that tries to convert a whole number to a string in a given base (decimal, binary, etc)
 // The program does this by repeatedly "picking out the last digit and then dividing the number to get rid of this digit"
@@ -81,15 +87,29 @@ function numberToString(n, base = 10){
     }
     do {
         result = String(n % base) + result
-        n /= base
+        // n /= base
+        n = Math.floor(n / base)
     } while (n > 0)
 
     return sign + result
 }
+console.log(numberToString(200, 100))  // 1.5e231.3e-3221.3e-3211.3e-3201.3e-3191.3e-3181.3...
 
-console.log(numberToString(13, 10))  // 1.5e231.3e-3221.3e-3211.3e-3201.3e-3191.3e-3181.3...
-
-/* Error Propagation */
+/* Error Propagation
+    - Not all problems can be prevented by the programmer.
+        - Erraneous and malformed inputs can be the direct result of external causes.
+    - Keep in mind that production systems must NEVER crash.
+        - Sometimes it is best to take bad input in stride and continue running.
+        - At other times, it is best to report the issue to the user and to give up.
+        - In either situation, the program must respond accordingly to the problem
+*/
+// Example - if a function that takes number inputs but receives strings
+function promptNumber(question){
+    let result = Number(prompt(question))
+    if (Number.isNaN(result)) return null  // the response here may be to return a special value
+    else return result
+}
+console.log(promptNumber("How many trees do you see?"))
 
 /* Exceptions */
 
