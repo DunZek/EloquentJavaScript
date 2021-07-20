@@ -120,7 +120,34 @@ function lastElement(array){
 
 /* Exceptions
     - "Exception handling" - stopping the program and proceeding to handle the problem
+    - "Exceptions" - mechanisms that allow code to raise/throw exceptions when problems are confronted
+        - These are to be caught before they unwind the
+    - Raising exceptions "unwind the stack", that is, they ...
+    - "Unwinding the stack" - ...
+    - 
 */
+// Example
+function promptDirection(question){
+    let result = prompt(question)
+    if (result.toLowerCase() == "left") return "L"
+    if (result.toLowerCase() == "right") return "R"
+    // If it's neither left nor right, then it's an invalid direction. An exception will be raised using the "throw" keyword
+    throw new Error("Invalid direction: " + result)
+    // ^^ this is just a standard constructor that creates an object with a message property containing the string.
+}
+
+function look(){
+    if (promptDirection("Which way?") == "L") return "a house"
+    else return "two angry bears"
+}
+
+try {
+    // Code will execute here.
+    console.log("You see", look())  // It all starts with this function call and all that it entails
+} catch (error) {
+    // The exception that has resulted from the execution of the try-block will be caught here, and the catch-block will execute
+    console.log("Something went wrong: " + error)
+}
 
 /* Cleaning Up After Exceptions */
 
