@@ -119,12 +119,14 @@ function lastElement(array){
 }
 
 /* Exceptions
-    - "Exception handling" - stopping the program and proceeding to handle the problem
-    - "Exceptions" - mechanisms that allow code to raise/throw exceptions when problems are confronted
-        - These are to be caught before they unwind the
-    - Raising exceptions "unwind the stack", that is, they ...
-    - "Unwinding the stack" - ...
-    - 
+    - "Exception handling" - stopping the program and proceeding to handle the problem.
+    - "Exceptions" - mechanisms that allow code to raise/throw exceptions when problems are confronted.
+    - Raising exceptions "unwind the stack", that is, exceptions ignore every context of execution to present itself.
+    - Exceptions are used to sense code bug and problems by unwinding the stack.
+        - These are to be caught before they completely unwind the stack whenever possible to make a decision.
+    - "Stack trace" - the stack of execution measured by the instance of a constructor that creates exception.
+        - The instance stores the trace in the "stack" property and can be helpful in debugging the problem.
+            - Tells us which function the exception is thrown from and the execution that gave way to it/
 */
 // Example
 function promptDirection(question){
@@ -132,11 +134,13 @@ function promptDirection(question){
     if (result.toLowerCase() == "left") return "L"
     if (result.toLowerCase() == "right") return "R"
     // If it's neither left nor right, then it's an invalid direction. An exception will be raised using the "throw" keyword
-    throw new Error("Invalid direction: " + result)
+    let myException = new Error("Invalid direction: " + result)
+    console.log("Logging (myException.stack): " + myException.stack)  // logging the stack trace of execution
+    throw myException
     // ^^ this is just a standard constructor that creates an object with a message property containing the string.
 }
 
-function look(){
+function look(){  // notice, this function completely ignores any error caused by promptDirection()
     if (promptDirection("Which way?") == "L") return "a house"
     else return "two angry bears"
 }
@@ -148,8 +152,34 @@ try {
     // The exception that has resulted from the execution of the try-block will be caught here, and the catch-block will execute
     console.log("Something went wrong: " + error)
 }
+// ^^ error-handling code is necessary only at the point of execution. Every other function can ignore the error
 
-/* Cleaning Up After Exceptions */
+/* Cleaning Up After Exceptions
+    - Thus, execeptions in effect cause control flow.
+    - Errors may be caused in every function call and property access. These are all the actions that may cause an exception.
+    - Regular control flow may be deceiving in its irremarkable appearance. However,
+        - code execution will suddenly fail if an execption is raised.
+*/
+// Example - A bad banking system
+const accounts = {a: 100, b: 0, c: 20}
+
+function getAccount(){
+    let accountName = prompt("Enter an account name:")
+    if (!accounts.hasOwnProperty(accountName)){
+        throw new Error("No such account: " + accountName)
+    }
+    return accountName
+}
+
+function transfer(from, amount){
+    if (accounts[from] < amount) return
+    accounts[from] -= amount  // money is taken out here to process transfer
+    accounts[getAccount()] += amount  // this function is dangerously called to transfer money to another.
+    // ^^ If an exception occur
+}
+
+transfer('a', 50)
+console.log(accounts)
 
 /* Selective Catching */
 
