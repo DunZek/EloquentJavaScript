@@ -111,6 +111,14 @@ function promptNumber(question){
 }
 console.log(promptNumber("How many trees do you see?"))
 
+// Example -
+function lastElement(array){
+    if (array.length == 0) return {failed: true}
+    else return {element: array[array.length - 1]}
+}
+
+
+
 /* Exceptions */
 
 /* Cleaning Up After Exceptions */
