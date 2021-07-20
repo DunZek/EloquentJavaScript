@@ -102,6 +102,7 @@ console.log(numberToString(200, 100))  // 1.5e231.3e-3221.3e-3211.3e-3201.3e-319
         - Sometimes it is best to take bad input in stride and continue running.
         - At other times, it is best to report the issue to the user and to give up.
         - In either situation, the program must respond accordingly to the problem
+    - Using special values to indicate error have their own disadvantageous however.
 */
 // Example - if a function that takes number inputs but receives strings
 function promptNumber(question){
@@ -111,7 +112,15 @@ function promptNumber(question){
 }
 console.log(promptNumber("How many trees do you see?"))
 
-/* Exceptions */
+// Example - wrapping function results in objects to distinguish success from failure
+function lastElement(array){
+    if (array.length == 0) return {failed: true}
+    else return {element: array[array.length - 1]}
+}
+
+/* Exceptions
+    - "Exception handling" - stopping the program and proceeding to handle the problem
+*/
 
 /* Cleaning Up After Exceptions */
 
