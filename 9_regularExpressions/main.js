@@ -113,6 +113,20 @@ console.log(match.index)  // 8 <- this is the index in the string where the matc
 // Example - using .match() method for string objects which behave similarly to .exec()
 console.log("one two 100".match(/\d+/))  // ["100"]
 
-// Example - using parentheses to indicate the matching of
-let quotedText = /"([^"]*)"/
+// Example - using parentheses
+let quotedText = /"([^"]*)"/  //
 console.log(quotedText.exec('she said "hello"'))  // ['"hello"', 'hello']
+
+// Example
+console.log(/bad(ly)?/.exec("bad"))  // ["bad", undefined] <- when a pattern-group does not end up being matched, it is undefined
+console.log(/(\d)+/.exec("123"))  // ["123", "3"] <- here, the last element from the multiple instances of a pattern is returned
+
+/* The Date Class
+    - JavaScript has a standard class for representing dates using the Date() constructor
+*/
+// Example - logging the current date and time by instanting an Date object
+console.log(new Date())
+
+// Example - instantiating a date
+console.log(new Date(2009, 10, 3))  // Note: the month parameter starts is interpreted zero-based
+// ^^ the last 4 arguments (hours, minutes, seconds, milliseconds) are optional and 0 by default
