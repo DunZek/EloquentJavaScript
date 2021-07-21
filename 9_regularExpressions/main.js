@@ -321,8 +321,40 @@ console.log(digit.exec("and now: 1"))  // null
 console.log("Banana".match(/an/g))  // ['an', 'an']
 // ^^ the global option enables String.match(RegExp) to return an array consisting of all matched patterns
 
-/* Looping Over Matches */
+/* Looping Over Matches - scanning through all the occurrences of a pattern in a given string */
+// Example - accessing the matched objects in a loop body
+let input = "A string with 3 numbers in it... 42 and 88."
+let numberExp = /\b\d+\b/g
+// let match;
+while (match = numberExp.exec(input)) console.log(`Found: ${match[0]} at index: ${match.index}`)
 
-/* Passing an INI file */
+/* Passing an INI file - a common problem for using regular expressions
+    - The widely used format for the .ini file:
+        - Blank lines and lines starting with semicolons are ignored.
+        - Lines wrapped in [ and ] start a new section
+        - Lines containing an alphanumeric identifier followed by an "=" character add a setting to the current section
+        - Anything else is invalid
+    - Task: "convert a stringified .ini file into a JavaScript object"
+        - Split the file into separate lines.
+*/
+// Example
+function parseINI(string){
+    // Start with an object to hold the top-level fields
+    let result = {}
+    let section = result
+
+    string.split(/\r?\n/).forEach
+
+
+    return result
+}
+
+console.log(parseINI(
+    `
+    name=Vasilis
+    [address]
+    city=Tessaloniki
+    `
+))  // -> {name: 'Vasilis', address: {city: 'Tessaloniki'}}
 
 /* International Characters */
