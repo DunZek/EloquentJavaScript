@@ -172,7 +172,7 @@ console.log(/x^/.test("RegEx"))  // false
 // Example - using word boundaries
 console.log(/cat/.test("concatenate"))  // true
 console.log(/\bcat\b/.test("concatenate"))  // false
-console.log(/\bcat\b/.test("cat"))  // true
+console.log(/\bcat\b/.test("con cat enate"))  // true
 
 /* Choice Patterns */
 let animalCount = /\b\d+ (pig|cow|chicken)s?\b/  // <- use the pipe "|" and parentheses to denote a choice between patterns
@@ -180,19 +180,146 @@ console.log(animalCount.test("15 pigs"))  // true
 console.log(animalCount.test("1 chicken"))  // true
 console.log(animalCount.test("15 pigchickens"))  // false
 
-/* The Mechanics of Matching */
+/* The Mechanics of Matching
+    - Regular expressions search patterns starting from the first character of the string up to the end.
+        - The first match may be returned if found.
+    - An expression is matched if every single one of its elements from left to right are matched within the given string.
+*/
 
-/* Backtracking */
+/* Backtracking
+    - A process in matching regular expressions when more than one possible kind of pattern may be matched to
+*/
+// Example - regex engine backtracking caused by choice patterns
+myRegEx = /\b([01]+b|[\da-f]+h|\d+)\b/  // search for either a binary ("b" suffixed), hexadecimal ("h" suffixed), or decimal number
+console.log(myRegEx.exec("0101b 306"))  // backtracks from decimal to binary
+myRegEx = /\b(\d+|[\da-f]+h|[01]+b)\b/  // switched binary and decimal places
+console.log(myRegEx.exec("0101b 306"))  // backtracks from decimal to binary
 
-/* The Replace Method */
+// Example - regex engine backtracking caused by repitition operators "+" & "*"
+myRegEx = /^.*x/  // 1st: (^.) -> entire string. 2nd: (^.*x) -> backtracks a character less, until "abc" is found
+console.log(myRegEx.exec("abcxe"))  // backtracking occurs until "abc" is found where an "x" occurs after "abc"
+// ^^ The final positions where the match is found then occurs from index 0 to index 4
 
-/* Greed */
+// Example - accidental backtracking
+myRegEx = /([01]+)+b/  // a binary-number regular expression that misproperly uses repitition operators
+console.log(myRegEx.exec("10010100010010011001101010101b"))  // here, double the work is done than otherwise
 
-/* Dynamically Creating RegExp Objects */
+/* The Replace Method
+    - Strings possess a .replace() method used for replacing parts of string with other strings
+*/
+// Example - replacing the first character instance with a different character
+console.log("papa".replace('p', 'm'))  // mapa
 
-/* The Search Method */
+// Example - using regular expressions
+console.log("Borobudur".replace(/[ou]/, "a"))  // "Barobudur" -> the first match is replaced with the given string
+console.log("borobudur".replace(/[ou]/g, "a"))  //  "Barabadar" -> the "g" character is used to signify "global" (do all matches)
+// ^^ Note: thus, only with use of regular expressions can we replace multiple instances of the given string-part we want
 
-/* The LastIndex Property */
+// Example - using matched groups to switch pairs of matched groups
+let lastFirst = "Liskov, Barbara" + "\n" + "McCarthy, John" + "\n" + "Wadler, Philip"
+let firstLast = lastFirst.replace(/(\w+), (\w+)/g, "$2 $1")  // $2 and $1 refer are bindings of matched groups. $& refers to the whole
+console.log(firstLast)  // Behold, the true power of regular expressions
+
+// Example - using a predicate function over a string to process matched arguments
+console.log("the cia and fbi".replace(/\b(cia|fbi)\b/g, str => str.toUpperCase()))  // the CIA and FBI
+// ^^ so, as you can tell, "str" of the predicate function is actually the groups matched by the regular expression from the string
+
+// Example - using a more complicated predicate function
+let stock = "1 lemon, 2 cabbages, and 101 eggs"
+function minusOne(match, amount, unit){  // ("entire regex match", "group 1 match", "group 2 match")
+    amount -= 1
+    if (amount == 0) amount = "no"
+    if (amount == 1) unit = unit.slice(0, unit.length - 1)
+    return `${amount} ${unit}`
+}
+console.log(stock.replace(/(\d+) (\w+)/g, minusOne))  // "no lemon, 1 cabbage, and 100 eggs"
+
+/* Greed
+    - We describe repitition operators ("+", "*", "?", and {}) to be greedy
+        - This is because repitition operators will much as many characters as possible before backtracking
+    - To turn repitition operators and make them lazy, suffix them with a question mark -> {+? , *? , ?? , {}?}
+        - This will cause repitition operators to match as least many characters as possible before backtracking.
+            - This causes the regular expression to match more only if the least possible match is invalid.
+*/
+// Example - a comment that strips comments out of code passed in as strings
+function stripComments(code){ return code.replace(/\/\/.*|\/\*[^]*\*\//g, "") }  // [^] = "any character that isn't part of the empty set of characters".
+// ^^ Periods are not used because they do not match with new lines, but we still want to read blocks of code
+console.log(stripComments("1 + /* 2 */3"))  // "1 + 3"
+console.log(stripComments("x + 1;// ten !"))  // x + 1;
+console.log(stripComments("1 /* a */+/* b */ 1"))  // "1  1"
+// ^^ the engine is greedy and first looked to match the entire string, thus matching the first /* with the second */, eliminating "+"
+console.log(/\/\*[^]*\*\//g.exec("/* a */ + /* b */"))  // <- as demonstrated here, where it matched the wrong group we desired
+
+// Example - fixing the previous regular expression by using lazy operators instead of greedy ones
+function stripComments2(code){ return code.replace(/\/\/.*|\/\*[^]*?\*\//g, "") }
+console.log(stripComments2("1 /* a */+/* b */ 1"))  // "1 + 1" <- here, both /* a */ and /* b */ are matched
+console.log(/\/\*[^]*?\*\//g.exec("/* a */ + /* b */"))  // <- now that our repitition operator is lazy, we match to the right comments
+
+/* Dynamically Creating RegExp Objects
+    - there are cases when you might not know the exact pattern you need to match against when writing your code.
+*/
+// Example - dynamically matching with normal names
+let name = "Harry"
+let text = "Harry is a suspicious character"
+let regexp = new RegExp("\\b(" + name + ")\\b", "gi")  // second argument contains arguments for regular expression. In this case, "gi" = "global and insensitive case"
+// ^^ remember to escape the slash that belongs to the bounding character when the regexp is expressed in a string
+console.log(text.replace(regexp, "_$1_"))  // _Harry_ is a suspicious character
+
+// Example - dynamically matching with weird strings
+name = "dea+hl[]rd"  // this will consequentially nonsensically evaluate the regular expression it is passed into
+// And so, we'll use backslashes to escape any special character in a given string of input
+let nameEscaped = name.replace(/[\\[.+*?(){|^$]/g, "\\$&")
+regexp = new RegExp("\\b" + nameEscaped + "\\b", "gi")
+text = "This dea+hl[]rd guy is really annoying."
+console.log(text.replace(regexp, "_$&_"))  // "This _dea+hl[]rd_ guy is really annoying"
+
+/* The Search Method
+    - The .indexOf() method of strings cannot be used with regular expressions, and so we have an analog.
+    - the .search() method returns the index of the first pattern matched by the expression
+        - otherwise -1 if not found
+    - Unlike .indexOf() however, we cannot indicate the starting index/offset to begin the search
+*/
+// Example
+console.log("  word".search(/\S/))  // 2 -> match what that isn't whitespace
+console.log("    ".search(/\S/))  // -1 -> it's all whitespace but we're trying to match what that isn't
+
+/* The LastIndex Property - "because confusion is an essential feature of JavaScript's regular-expression interface"
+    - Similarly, the .exec() method also does not provide a way to indicate the offset of the search.
+    - So, we're going to have to be inventive by using the properties of regular expressions in JavaScript.
+        - RegExp.source -> contains the string the expression was created from
+        - RegExp.lastIndex -> controls, in limited circumstances, where the next match will start
+            - these limited circumstances are when the expression has the global "g" or sticky "y" option passed in
+            - furthermore, the matching must happen with the .exec() method and no other.
+    - Becareful of how sticky and global regular expressions work, global options in particular as well.
+        - Use the global property only when necessary:
+            - when replacing parts of strings matched by a given pattern with String.replace(RegExp, String)
+            - when explicitly using the lastIndex property to control the offset of where regex matching should begin in a given string.
+    - Remember that the lastIndex property requires the use of the .exec() method and the global "g" option in the given regular expression/
+*/
+// Example - the lastIndex property
+let pattern = /y/g  // <- matching for "y" with global option set
+console.log(pattern.lastIndex)
+pattern.lastIndex = 0  // <- it is a public property, so you can edit it if you want
+match = pattern.exec("xyzzy")
+console.log(match)
+console.log(match.index)  // 4 <- the index at which the matched pattern occured in the given string in put
+console.log(pattern.lastIndex)  // 5 <- successful matches update the lastIndex property accordingly to after the character, else set to 0
+
+// Example - demonstrating the difference between global "g" and sticky "y"
+let globalExp = /abc/g
+console.log(globalExp.exec("xyz abc"))  // ['abc', ...] <- global searches for a match ahead of the lastIndex
+let stickyExp = /abc/y
+console.log(stickyExp.exec("xyz abc"))  // null <- sticky will only match successfully for patterns occuring at the lastIndex
+console.log(stickyExp.exec("abc"))  // ['abc', ...] <- since the lastIndex starts at 0 upon construction, then a match will occur
+
+// Example - demonstrating an effect of invoking the same global regular expression
+let digit = /\d/g
+console.log(digit.exec("here it is: 1"))  // ['1'] <- the lastIndex gets updated for the current match and thus
+console.log(digit.exec("and now: 1"))  // null
+
+// Example - demonstrating how the global option can change the way the String.match() works
+console.log("Banana".match(/an/g))  // ['an', 'an']
+// ^^ the global option enables String.match(RegExp) to return an array consisting of all matched patterns
 
 /* Looping Over Matches */
 
