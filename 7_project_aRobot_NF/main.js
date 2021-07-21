@@ -96,6 +96,7 @@ function runRobot(state, robot, memory){  // VillageState, predicate-function, m
     }
 }
 
+// Here is a strategy to finish the robot's mission:
 function randomPick(array){
     let choice = Math.floor(Math.random() * array.length)  // return a random index from the given array
     return array[choice]
