@@ -130,3 +130,72 @@ console.log(new Date())
 // Example - instantiating a date
 console.log(new Date(2009, 10, 3))  // Note: the month parameter starts is interpreted zero-based
 // ^^ the last 4 arguments (hours, minutes, seconds, milliseconds) are optional and 0 by default
+
+// Example - timestamps are stored in milliseconds, counted all the way back to the start of 1970 (Unix time)
+console.log(new Date(2013, 11, 19).getTime())  // 1387436400000
+console.log(new Date(1387436400000))  // 2013-12-1970 00:00:000Z <- you may use negative numbers for numbers before 1970
+// ^^ Note: a single argument passed in to the constructor will treat it as milliseconds
+
+// Example - retrieving the current timestamp
+console.log(new Date().getTime())  // either this
+console.log(Date.now())  // <- or by using a static method from Date
+
+// Example - Date object methods
+console.log(new Date().getFullYear())
+console.log(new Date().getMonth())
+console.log(new Date().getDate())
+console.log(new Date().getHours())
+console.log(new Date().getSeconds())
+console.log(new Date().getYear())  // <- returns "current-year - 1900". This is utterly useless. Don't ever use this.
+
+// Example - creating a date object from a string by using parentheses in regular expressions
+function getDate(string){
+    let [_, month, day, year] = /(\d{1,2})-(\d{1,2})-(\d{4})/.exec(string)
+    // ^^ the _ is ignored used only to skip the fully-matched element in the array returned by .exec()
+    return new Date(year, month - 1, day)
+}
+console.log(getDate("1-30-2003"))
+
+/* Words And String Boundaries */
+// Example - test for patterns where only numbers span the entire string
+console.log(/^\d+$/.test("1234"))  // true
+console.log(/^\d+$/.test("12ERS6_"))  // false
+
+// Example - test for patterns where the string starts with an exclamation-mark "!"
+console.log(/^!/.test("!hello"))  // true
+console.log(/^!/.test("wor!d"))  // false
+
+// Example - do not match any string
+console.log(/x^/.test("0xff"))  // false
+console.log(/x^/.test("RegEx"))  // false
+
+// Example - using word boundaries
+console.log(/cat/.test("concatenate"))  // true
+console.log(/\bcat\b/.test("concatenate"))  // false
+console.log(/\bcat\b/.test("cat"))  // true
+
+/* Choice Patterns */
+let animalCount = /\b\d+ (pig|cow|chicken)s?\b/  // <- use the pipe "|" and parentheses to denote a choice between patterns
+console.log(animalCount.test("15 pigs"))  // true
+console.log(animalCount.test("1 chicken"))  // true
+console.log(animalCount.test("15 pigchickens"))  // false
+
+/* The Mechanics of Matching */
+
+/* Backtracking */
+
+/* The Replace Method */
+
+/* Greed */
+
+/* Dynamically Creating RegExp Objects */
+
+/* The Search Method */
+
+/* The LastIndex Property */
+
+/* Looping Over Matches */
+
+/* Passing an INI file */
+
+/* International Characters */
