@@ -3,31 +3,31 @@
 
 // Fill in the regular expressions
 
-verify(/.../,
+verify(/ca[rt]/,  // "car" and "cat"
        ["my car", "bad cats"],
        ["camper", "high art"]);
 
-verify(/.../,
+verify(/pr?op/,  // "pop" and "prop"
        ["pop culture", "mad props"],
        ["plop", "prrrop"]);
 
-verify(/.../,
+verify(/ferr(et|y|ari)/,  // "ferret", "ferry", and "ferrari"
        ["ferret", "ferry", "ferrari"],
        ["ferrum", "transfer A"]);
 
-verify(/.../,
+verify(/\w+ious\b/,  // ending in "ious"
        ["how delicious", "spacious room"],
        ["ruinous", "consciousness"]);
 
-verify(/.../,
+verify(/\s(\.|,|:|;)/,  // whitespace character followed by a ".", ",", ":", or ";"
        ["bad punctuation ."],
        ["escape the period"]);
 
-verify(/.../,
+verify(/\w{6,}/,  // a word longer than six letters
        ["Siebentausenddreihundertzweiundzwanzig"],
        ["no", "three small words"]);
 
-verify(/.../,
+verify(/([^eE])/g,  // a word without "e" or "E"
        ["red platypus", "wobbling nest"],
        ["earth bed", "learning ape", "BEET"]);
 
