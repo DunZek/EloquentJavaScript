@@ -338,28 +338,90 @@ while (match = numberExp.exec(input)) console.log(`Found: ${match[0]} at index: 
         - Split the file into separate lines.
 */
 // Example
-function parseINI(string){
-    console.log(string)
-    // Preprocess input data
-    let codeLines = /(w+)\r/g.exec(string)
-    console.log(codeLines)
-    // Create return object
-    let result = []
-    // for (let i=0; i < codeLines.length; i++){
-    //
-    // }
+function parseINI(ini){
+    // Start with an object to hold the top-level fields
+    let result = {}
+    let section = result
+    ini.split(/\r?\n/).forEach(line => {
+        let match;
+        if (match = line.match(/^(\w+)=(.*)$/)) section[match[1]] = match[2]
+        else if (match = line.match(/^\[(.*)\]$/)) section = result[match[1]] = {}
+        else if (!/^\s*(;.*)?$/.test(line)) throw new Error (`Line '${line}' is not valid.`)
+    })
 
     return result
 }
 
-console.log(parseINI(
-    `
-    name=Vasilis
-    [address]
-    city=Tessaloniki
-    `
-))  // -> {name: 'Vasilis', address: {city: 'Tessaloniki'}}
+console.log(parseINI(`
+name=Vasilis
+[address]
+city=Tessaloniki
+[biology]
+type=Human`))  // -> {name: 'Vasilis', address: {city: 'Tessaloniki'}}
 
-console.log()
+/* International Characters
+    - JavaScript's regular expressions cannot support text outside of the English language due to JavaScript's simplistic implementations.
+    - A word (\w) may consist of the following:
+        - The 26 uppercase and lowercase characters of the Latin alphabet
+        - Decimal digits
+        - An underscore
+    - Any character that do not match within the aforementioned will match with \W (nonword character) and not \w'
+    - Whitespace (\s) however by strange historical accident do not have these limitations:
+        - Matches to any whitespace character defined by Unicode standard.
+        - including the non-breaking space and the Mongolian vowel seperator (??)
+    - Further issues are caused by the fact that regular expressions work on code units, not the characters themselves that the code represents:
+        - This means that characters composed of two code units behave strangely.
+*/
+// Example - demonstrating JavaScript's strange regex implementation
+console.log(/b{3}/.test("bbb"))  // true
+console.log(/🍎{3}/.test("🍎🍎🍎"))  // false <- 🍎 is treated as two code units, yet the {3} applies only to the second 🍎
+console.log(/<.>/.test("<🌹>"))  // false <- the dot matches for a single code unit, not the two that make up 🌹
+console.log(/<.>/u.test("<🌹>"))  // true <- adding the "u" option at the end (for "Unicode") will solve these problems
 
-/* International Characters */
+// Example - using \p in regular expressions to solve international character problems
+console.log(/\p{Script=Greek}/u.test("α"))  // true <- You must have the "u" option enabled
+console.log(/\p{Script=Arabic}/u.test("α"))  // false
+console.log(/\p{Alphabetic}/u.test("α"))  // true
+console.log(/\p{Alphabetic}/u.test("!"))
+// ^^ Use the {Property=Value} notation to match any character that has the value for the given property, else {Name} notation assumes binary or categories
+
+/* Summary
+    - Regular expressions are objects that represent patterns in strings.
+        - They use their own language to represent these patterns.
+    /abc/    = a sequence of the characters "abc"
+    /[abc]/  = any character from the set of characters
+    /[^abc]/ = any character NOT from the set of characters
+    /[0-9]/  = any character from the range of characters
+    /x+/     = one or more characters of the pattern "x"
+    /x+?/    = one or more characters (lazy)
+    /x* /    = zero or more occurences
+    /x?/     = zero or one occurence
+    /x{2,4}/ = two to four occurences
+    /(abc)/  = a group
+    /a|b|c/  = any one of several patterns
+    /\d/     = any digit character
+    /\w/     = any alphanumeric "word" character (Latin script + underscore)
+    /\s/     = any whitespace character (Unicode standard)
+    /./      = any character except newlines
+    /\b/     = a word boundary
+    /^/      = start of input
+    /$/      = end of input
+
+    - JavaScript implements particular regular expression methods:
+        - RegExp.test(String) -> returns true or false whether regex pattern is found in string
+        - RegExp.exec(String) -> returns an array containing all matched groups and some other properties
+        - RegExp.exec(String).index -> a property of aforementioned array that contains the index at which the pattern is found in the string
+    - JavaScript implements particular string methods that utilize regular expressions:
+        - String.match(RegExp) -> used to match against a regular expression
+        - String.search(RegExp) -> searches for a pattern
+        - String.replace(RegExp, String) -> replaces a portion of the string found by the regex pattern with another string
+    - Regular expressions have options which are written after the closing forward slash
+        - "i" -> make match-case insensitive
+        - "g" -> make expression global (causes String.replace() to replace all instances)
+        - "y" -> make expression sticky. Do not search ahead and skip part of the string when looking for a match
+        - "u" -> Unicode mode. Used to international character problems
+
+    - Regular expressions are both sharp and awkward tools. They can simplify a task and on the same token make complicated ones unmanageable
+    - Resist the urge to shoehorn things that cannot cleanly express themselves
+
+*/
