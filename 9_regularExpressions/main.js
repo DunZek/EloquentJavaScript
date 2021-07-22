@@ -339,12 +339,15 @@ while (match = numberExp.exec(input)) console.log(`Found: ${match[0]} at index: 
 */
 // Example
 function parseINI(string){
-    // Start with an object to hold the top-level fields
-    let result = {}
-    let section = result
-
-    string.split(/\r?\n/).forEach
-
+    console.log(string)
+    // Preprocess input data
+    let codeLines = /(w+)\r/g.exec(string)
+    console.log(codeLines)
+    // Create return object
+    let result = []
+    // for (let i=0; i < codeLines.length; i++){
+    //
+    // }
 
     return result
 }
@@ -356,5 +359,7 @@ console.log(parseINI(
     city=Tessaloniki
     `
 ))  // -> {name: 'Vasilis', address: {city: 'Tessaloniki'}}
+
+console.log()
 
 /* International Characters */
