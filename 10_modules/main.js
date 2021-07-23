@@ -36,10 +36,10 @@ let weekDay = function() {
     const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
     return {  // public interfaces
-        number(name) { return names.indexOf(name) }
+        number(name) { return names.indexOf(name) },
         name(number) { return names[number] }
     }
-}
+}()  // <- the return function that is invoked
 // ^^ provides isolation, but not dependency-declaration.
 // ^^ Reveals interface to the global scope. Expects its dependencies to do the same. This is a style used for a long-time ago.
 console.log(weekDay.name(weekDay.number("Sunday")))
@@ -62,7 +62,44 @@ let plusOne = Function("n", "return n + 1")  // a string containing comma-sepera
 console.log(plusOne(4))  // 5
 // ^^ Exactly what module systems need: wrapping module code in a function and using its scope as module scope.
 
-/* CommonJS */
+/* CommonJS
+    - "CommonJS" - most widely-used approach to bolted-on JavaScript modules. Used by Node.js and most NPM packages.
+    - "require()" - the functional essence of CommonJS. Loads modules and dependencies via names and returns their interface.
+*/
+// Example - using two NPM modules to return date time
+const ordinal = require('ordinal')  // converts numbers to strings: 1 -> "1st", 2 -> "2nd", etc.
+// ^^ Overwriting "module.exports" will replace the empty interface object provided in order to export single values instead
+// ^^ exports an interface consisting of "ordinal()", a single function
+const {days, months} = require('date-names') // returns names for weekdays and months. Exports formatDate(Date object, String)
+// ^^ exports an object containing multiple properties. Destructuring becomes convenient for creating bindings for exported interfaces
+exports.formatDate = function(date, format){
+    return format.replace(/YYYY|M(MMM)?|Do?|dddd/g, tag => {
+        if (tag == "YYYY") return date.getFullYear()
+        if (tag == "M") return date.getMonth()
+        if (tag == "MMMM") return months[date.getMonth()]
+        if (tag == "D") return date.getDate()
+        if (tag == "Do") return ordinal(date.getDate())  // invoke ordinal function from module
+        if (tag == "dddd") return days[date.getDay()]
+    })
+}
+
+// Example - interface functions that get added to "exports" so that modules that depend on it get access it
+// const {formatDate} = require('./format-date')  // <- So, we can use the module like this:
+// console.log(formatDate(new Date(2017, 9, 13), "dddd the Do"))  // Friday the 13th
+console.log(exports.formatDate(new Date(2017, 9, 13), "dddd the Do"))  // Friday the 13th
+
+// Example - "require()" in its most minimal form -> an implementation of "require()"
+require.cache = Object.create(null)  // reset cache, a storage containing already loaded modules
+function require(name){
+    If (!(name in require.cache)){  // require() makes sure to see if the module isn't already loaded in.
+        let code = readFile(name)  // <- a function that reads a file and returns its contents as a string
+        let module = {exports: {}}
+        require.cache[name] = module
+        let wrapper = Function("require, exports, module", code)
+        wrapper(require, module.exports, module)
+    }
+    return require.cache[name].exports
+}
 
 /* EcmaScript Modules */
 
