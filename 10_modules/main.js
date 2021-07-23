@@ -64,7 +64,10 @@ console.log(plusOne(4))  // 5
 
 /* CommonJS
     - "CommonJS" - most widely-used approach to bolted-on JavaScript modules. Used by Node.js and most NPM packages.
-    - "require()" - the functional essence of CommonJS. Loads modules and dependencies via names and returns their interface.
+    - "require(address)" - the functional essence of CommonJS. Loads modules and dependencies via names and returns their interface.
+        - The string address given to require() is interpreted differently across different systems.
+            - "./" or "../" is generally interpreted as the chosen filename being relative to the current module's filename directory
+            - When the name isn't relative, Node.js will look for an installed package by that name.
 */
 // Example - using two NPM modules to return date time
 const ordinal = require('ordinal')  // converts numbers to strings: 1 -> "1st", 2 -> "2nd", etc.
@@ -89,20 +92,83 @@ exports.formatDate = function(date, format){
 console.log(exports.formatDate(new Date(2017, 9, 13), "dddd the Do"))  // Friday the 13th
 
 // Example - "require()" in its most minimal form -> an implementation of "require()"
-require.cache = Object.create(null)  // reset cache, a storage containing already loaded modules
-function require(name){
-    If (!(name in require.cache)){  // require() makes sure to see if the module isn't already loaded in.
-        let code = readFile(name)  // <- a function that reads a file and returns its contents as a string
-        let module = {exports: {}}
-        require.cache[name] = module
-        let wrapper = Function("require, exports, module", code)
-        wrapper(require, module.exports, module)
-    }
-    return require.cache[name].exports
-}
+// require.cache = Object.create(null)  // reset cache, a storage containing already loaded modules
+// function require(name){
+//     if (!(name in require.cache)){  // require() makes sure to see if the module isn't already loaded in.
+//         let code = readFile(name)  // <- a function that reads a file and returns its contents as a string
+//         let module = {exports: {}}
+//         require.cache[name] = module
+//         let wrapper = Function("require, exports, module", code)
+//         wrapper(require, module.exports, module)
+//     }
+//     return require.cache[name].exports
+// }
 
-/* EcmaScript Modules */
+// Example - importing an INI file parser instead of writing our own
+const {parse} = require("ini")
+console.log(parse("x = 10\ny = 20"))  // {x: "10", y: "20"}
 
-/* Building and bundling */
+/* EcmaScript Modules
+    - The combination of CommonJS modules and the NPM have enabled the JavaScript community to be extensible.
+    - However, there are some problems that still remain:
+        - Things initialized in "exports" are not available in local scopes.
+        - It is hard to determine the dependencies of a module without running its code using "require()"
+    - The aforementioned issues pushed the 2015 standard of JavaScript to introduce its own, different module system.
+        - "ES (ECMAScript) modules" -> The main concepts of dependencies and interfaces remain the same, however details differ:
+            - The notation is now integrated into the language. The "import" keyword now replaces having to call a function
+    - ES module interfaces are sets of names bindings.
+        - Importing modules results in those bindings being imported, not their values.
+        - These bindings may change values at any time.
+    - ES modules get imported before they run. Therefore,
+        - "import" declarations may not appear inside functions or blocks
+        - and the names of dependencies must be quoted strings, not arbitrary expressions.
+    - Many projects now are written using ES modules and then automatically converted to some other format when published.
+    - A JavaScript developer is required to be able to use the two different module systems as they are used side-by-side.
+*/
+// Example - accessing a dependency using ECMAScript 6 (JavaScript 2015)
+import ordinal from "ordinal"
+import {days, months} from "date-names"
 
-/* Module design */
+// Example - using "export" before an expression
+export default ["Winter", "Spring", "Summer", "Autumn"]  // the "default" keyword is a binding that makes it the main exported binding
+// ^^ Note: alongside default, other bindings may still be exported
+
+// Example - renaming imported bindings using the keyword "as"
+import {days as dayNames} from "date-names"
+console.log(dayNames.length)
+
+/* Building and bundling
+    - Many JavaScript projects aren't even technically written in JavaScript.
+    - Extensions are often planned to be used with language long before JavaScript is actually ran in platforms that support them.
+        - This is possible because present dialects of JavaScript are compiled into older and past versions so that old browsers can run it.
+
+    - Modular programs that consist of hundreds of files take too long to be loaded decently in web browsers.
+    - Because singular big files take much faster to load than multiple smaller ones, programmers have started using "bundlers"
+    - "Bundlers" - tools that transform programs into big singular files before being published to the web.
+
+    - The sizes of files must also be taken to consideration. Thus, the JavaScript community invented "minifiers"
+    - "Minifiers" - tools that reduce bundled JavaScript programs to the bare minimum file size by:
+        - removing comments and whitespace,
+        - renaming bindings,
+        - and by generally replacing pieces of code with equivalent code that takes up less space.
+
+    - Many NPM packages that run on web-pages have therefore then gone through multiple stages of transformation:
+        - conversion from modern JavaScript to historic Javascript,
+        - conversion from using ES modules to Common JS modules,
+        - and being bundled and then minified.
+
+    - So, be aware that the JavaScript code that gets run is often not the source code as it was written.
+*/
+
+/* Module design
+    - Program stucturing is one of the subtler aspects of programming.
+    - There are trade-offs involved when trying to model the design of nontrivial pieces of functionality.
+    - Furthermore, the best way to learn the value of well-structured design is through experience:
+        - reading or working on a lot of programs,
+        - noticing what works and what doesn't.
+    - As a programmer, do not assume that painful messes are forever painful messes.
+        - The structure of almost everything can be improved by giving more thought into it.
+
+    - "Ease of use" -> designing something for multiple people for long stretches of time that remain simple and predictable.
+    
+*/
