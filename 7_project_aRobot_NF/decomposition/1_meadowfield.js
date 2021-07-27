@@ -1,3 +1,8 @@
+/* Meadowfield
+    - define and return a list of the points of Meadowfield
+        - for each point, define a list of other points accessible to it
+*/
+
 const roads = [
     "Alice's House-Bob's House",   "Alice's House-Cabin",
     "Alice's House-Post Office",   "Bob's House-Town Hall",
