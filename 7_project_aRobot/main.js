@@ -27,7 +27,7 @@ function buildGraph(edges){
     return forReturn
 }
 let roadGraph = buildGraph(roads)
-console.log(roadGraph)
+// console.log(roadGraph)
 
 
 /* The Task
@@ -56,10 +56,10 @@ let first = new VillageState(
     [{place: "Post Office", address: "Alice's House"}]  // <- a parcel to be delivered
 )
 let next = first.move("Alice's House")
-console.log(next)
-console.log(next.place)  // Alice's House
-console.log(next.parcel)  // []
-console.log(first.place)  // Post Office
+// console.log(next)
+// console.log(next.place)  // Alice's House
+// console.log(next.parcel)  // []
+// console.log(first.place)  // Post Office
 
 /* Persistent Data
     - "Immutable" - the incapacity to change
@@ -75,7 +75,7 @@ console.log(first.place)  // Post Office
 */
 let object = Object.freeze({value: 5})
 object.value = 10  // no effect
-console.log(object.value)  // 5
+// console.log(object.value)  // 5
 
 /* Simulation
     - One can conceive of the robot as a function which returns a direction of choice using particular parameters
