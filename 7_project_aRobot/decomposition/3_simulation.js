@@ -3,12 +3,17 @@
     - return an object whose properties is a direction and a memory value
 */
 
+let roadGraph = require('./2_theTask.js')
+
 //
 function runRobot(state, robot, memory){
     // Run a loop to simulate
     for (let turn = 0;; turn++){
         // Report when finished
-        if (state.parcels.length == 0) console.log(`Done in ${turn} turns`)
+        if (state.parcels.length == 0) {
+            console.log(`Done in ${turn} turns`)
+            break;
+        }
 
         // Instantiate / do an action for each turn. Use the "robot" predicate function
         let action = robot(state, memory)
@@ -32,4 +37,19 @@ function randomPick(array){
 // The function itself
 function randomRobot(state){ return {direction: randomPick(roadGraph[state.place])} }
 
-//
+// Defining a static method to create a new state with some parcels
+VillageState.random = function(parcelCount = 5) {
+  let parcels = [];
+  for (let i = 0; i < parcelCount; i++) {
+    let address = randomPick(Object.keys(roadGraph));
+    let place;
+    do {
+      place = randomPick(Object.keys(roadGraph));
+    } while (place == address);
+    parcels.push({place, address});
+  }
+  return new VillageState("Post Office", parcels);
+};
+
+// Starting up the virtual world
+runRobot(VillageState.random(), randomRobot)
