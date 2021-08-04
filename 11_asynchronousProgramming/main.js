@@ -18,7 +18,16 @@ bigOak.readStorage("food caches", caches => {
     })
 })
 
-// ./crow-tech.send(target_nest_name, type_of_request, content, callback_function)
+// A callback-based function ./crow-tech.send(target_nest_name, type_of_request, content, callback_function)
+bigOak.send("Cow Pasture", "note", "Let's caw loudly at 7 PM", () => console.log("Note received"))
+
+// Defining request types - defining implementation
+import defineRequestType from './crow-tech'
+defineRequestType("note", (nest, content, source, done) => {
+    console.log(nest.name, "received note:", source)
+    done()  // a callback function that must be called when the request is done
+})
+
 
 /* Promises */
 
