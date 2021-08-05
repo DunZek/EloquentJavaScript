@@ -6,7 +6,7 @@
     - A way to tackle asynchronous programming is to use "callback functions" for actions that take long.
     - when the action is finished, the callback function is called with the result
     - Functions that invoke asynchronous functions must itself be asynchronous.
-    	- Callbacks or similar mechanisms are used to deliver back results.		
+    	- Callbacks or similar mechanisms are used to deliver back results.
 	- Calling callbacks complicate programs and are more error-prone, thus may not be the best way however to structure programs.
 */
 
@@ -33,7 +33,7 @@ defineRequestType("note", (nest, content, source, done) => {
 })
 
 
-/* Promises 
+/* Promises
 	- Returning objects that represent future events instead of a callback function.
 	- "Promise" is a standard class used to represent abstract concepts in asynchronous programs using values.
 		- It is an synchronous action that may complete at some point and return a value.
@@ -41,6 +41,7 @@ defineRequestType("note", (nest, content, source, done) => {
 	- Promises are instantiated using Promise.resolve().
 		- This function ensures given values are wrapped in a promise.
 		- Promised values are otherwise returned immediately.
+    - Promises simplify asynchronous functions by being normal asynchronour functions that do not need callbacks
 */
 let fifteen = Promise.resolve(15)
 
@@ -49,13 +50,13 @@ fifteen.then(value => console.log("Got:", value))  // Got: 15
 
 // Creating a promise-based interface for readStorage
 function storage(nest, name){
-	return new Promise(resolve => {
+	return new Promise(resolve => {  // the promise constructor expects a function used to resolve the promise
 		nest.readStorage(name, result => resolve(result))
 	})
 }
 
-let enemies = storage(bigOak, "enemies")
-enemies.then(value => console.log("Resolved:", value))
+storage(bigOak, "enemies").then(value => console.log("Resolved:", value))
+// ^^
 
 /* Failure */
 
