@@ -28,10 +28,26 @@ defineRequestType("note", (nest, content, source, done) => {
     done()  // a callback function that must be called when the request is done
 })
 
-
 /* Promises */
+let fifteen = Promise.resolve(15)
+fifteen.then(value => console.log(`Got ${value}`))
+
+function storage(nest, name){
+    return new Promise(resolve => {
+        nest.readStorage(name, result => resolve(result))
+    })
+}
 
 /* Failure */
+new Promise((_, reject) => reject(new Error("Faile")))
+    .then(value => console.log("Handler 1"))
+    .catch(reason => {
+        console.log("Caught failure " + reason)
+        return "nothing"
+    })
+    .then(value => console.log("Handler 2", value))
+
+// Fucking forget it. This book is so eloquent everything has to be poetic. It has become an incomprehensible piece of text.
 
 /* Networks are hard */
 
