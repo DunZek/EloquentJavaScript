@@ -55,7 +55,7 @@ let first = new VillageState(
     "Post Office",  // <- current place
     [{place: "Post Office", address: "Alice's House"}]  // <- a parcel to be delivered
 )
-let next = first.move("Alice's House")
+// let next = first.move("Alice's House")
 // console.log(next)
 // console.log(next.place)  // Alice's House
 // console.log(next.parcel)  // []
@@ -74,7 +74,7 @@ let next = first.move("Alice's House")
     - Unfortunately, designing systems with persistent data is hard, especially when the programming language doesn't help too much.
 */
 let object = Object.freeze({value: 5})
-object.value = 10  // no effect
+// object.value = 10  // no effect
 // console.log(object.value)  // 5
 
 /* Simulation
@@ -119,7 +119,7 @@ VillageState.random = function(parcelCount = 5){
     return new VillageState("Post Office", parcels)
 }
 
-runRobot(VillageState.random(), randomRobot)
+// runRobot(VillageState.random(), randomRobot)
 
 /* The Mail Truck's Route */
 // Here's a route that passes all places in the village starting from the post office
@@ -136,7 +136,7 @@ function routeRobot(state, memory){
     return { direction: memory[0], memory: memory.slice(1) }
 }
 
-runRobot(VillageState.random(), routeRobot, [])
+// runRobot(VillageState.random(), routeRobot, [])
 
 /* Pathfinding - adjusting the robot's behavior accordingly to the task
     - A route-finding function is required to accomplish the following:
@@ -171,4 +171,6 @@ function goalOrientedRobot({place, parcels}, route) {
     return { direction: route[0], memory: route.slice(1) }
 }
 
-runRobot(VillageState.random(), goalOrientedRobot, [])
+// runRobot(VillageState.random(), goalOrientedRobot, [])
+
+export {VillageState, routeRobot, goalOrientedRobot}

@@ -1,32 +1,44 @@
 'use strict';
 
 // Dependencies
-require('./main.mjs')
+import {VillageState, routeRobot, goalOrientedRobot} from './main.mjs'
 
 /* Measuring a robot
     - Write a compareRobots():
         - Takes in two robots
         - Takes in robot starting memory
-        - Generate 100 tasks and let each robot solve these tasks. Same task for each robot.
-        - Return the average number of steps each robot took per task
+        - Generate 100 simulations and let each robot solve these simulations. Same list of simulations for each robot.
+        - Return the average number of steps each robot took per simulation
+
+Pseudocode:
+Input: 2 robots
+compareRobots(robots, memories):
+    for robot in [routeRobot, goalOrientedRobot] with "[]" memory:
+        - Simulation 1   -> Tasks: [parcel 1, parcel 2, ..., parcel 5] -> "N"-number steps took to completion
+        - Simulation 2   -> Tasks: [parcel 1, parcel 2, ..., parcel 5] -> "N"-number steps took to completion
+        - ...
+        - Simulation 100 -> Tasks: [parcel 1, parcel 2, ..., parcel 5] -> "N"-number steps took to completion
+    return "average number of steps taken in each simulation for the total 100 simulations ran" for each robot
+    // ^^ "Sum of a hundred numbers" / 100
+Output: 2 numbers
 */
 function compareRobots(robots, memories){
-    // Generate worlds to run on
+    // Return value -> 2 numbers particular to specific robot
+    let averages = {}
+
+    // Generate the list of simulations to run through
     let villages = []
     for (let i=0; i!=100; i++) villages.push(new VillageState.random())
-    // Run the world simulations per robot and record average steps taken per robot
-    let outputAverage = []  // returned output
+
+    // Run each robot
     for (let i=0; i!=robots.length; i++){
-        let steps = []
-        // Run through task
-        for (let substrate of villages){
-            // Extract executable world from substrate
-            let village = new VillageState(substrate.place, substrate.parcels)
-            console.log(village)
-            // Run through village
+        let turnNumbers = []
+        // Run through list of simulations
+        for (let village of villages){
+            // Run and finish tasks
             for (let turn=0;; turn++){
                 if (village.parcels.length == 0) {
-                    steps.push(turn)
+                    turns.push(turn)
                     break
                 }
                 let action = robots[i](village, memories[i])
@@ -35,16 +47,18 @@ function compareRobots(robots, memories){
                 console.log(`Moved to ${action.direction}`)
             }
         }
-        let averageSteps = steps.reduce((sum, step) => sum + step) / steps.length
 
-        // Push to output average once done computations
-        outputAverage.push({robot: robots[i], averageSteps})
+        // Push to output average once done computation
+        averages[robot] = turnNumbers.reduce((sum, steps) => sum + step) turnNumberes / turnNumbers.length
     }
 
-    return outputAverage
+    return averages
 }
 
+
+
 console.log(compareRobots([routeRobot, goalOrientedRobot], [[], []]))
+
 
 /* Robot efficiency */
 
