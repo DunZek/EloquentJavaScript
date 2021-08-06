@@ -1,7 +1,7 @@
 'use strict';
 
 // Dependencies
-require('./main.js')
+require('./main.mjs')
 
 /* Measuring a robot
     - Write a compareRobots():
