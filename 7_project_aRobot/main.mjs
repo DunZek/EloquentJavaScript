@@ -168,6 +168,8 @@ function goalOrientedRobot({place, parcels}, route) {
         if (parcel.place != place) route = findRoute(roadGraph, place, parcel.place)
         else route = findRoute(roadGraph, place, parcel.address)
     }
+    // print memory
+    // console.log('memory', route.slice(1))
     return { direction: route[0], memory: route.slice(1) }
 }
 
