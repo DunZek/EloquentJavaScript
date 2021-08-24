@@ -50,9 +50,10 @@ function aToZ(pointA, pointZ) {
     //
     let routeList = []
     for (let point of roadGraph[pointA]) routeList.push([pointA, point])
-    console.log('routeList', routeList)
+    // console.log('routeList', routeList)
 
     // Recursive function
+    let i = 0  // <- for debug
     function func(oldList) {
         let newList = []
         // algorithm
@@ -62,26 +63,33 @@ function aToZ(pointA, pointZ) {
                 if ( oldList.every(route => route.every(point => destination != point))) newList.push([...route, destination])
             }
         }
-        console.log('newList', newList)
 
+        // debug
+        i++
+        console.log(`iteration(s): ${i} -> newList`, newList)
 
         // Return or recurse
-        if ( newList.some(route => route.some(point => point == pointZ) ) ) {
+        if ( newList.some(route => route.some(point => point == pointZ)) ) {
             let filtered = newList.filter(route => route.some(point => point == pointZ))
-            console.log('filtered', filtered)
-            return filtered
+            console.log('filtered', typeof filtered, filtered)
+            return filtered  // <- return list of routes only containing pointZ
         }
-        else func(newList)
+        else func(newList)  // <- if newList does not contain pointZ, recurse until so
         // else return newList
     }
 
     // debug
 
     // Return the shortest route
-    return func(routeList).reduce((given, arr) => given.length <= arr.length ? given : arr)
+    let filtered = func(routeList)
+    console.log('filtered', filtered)
+    return filtered.reduce((given, arr) => given.length <= arr.length ? given : arr)  // TODO: why tf does func() return undefined when routes.length > 4 ???
 }
-console.log(aToZ("Post Office", "Daria's House"))
-// console.log(aToZ("Post Office", "Cabin"))
+console.log("Eureka!", aToZ("Post Office", "Cabin"))
+console.log("Eureka!", aToZ("Post Office", "Farm"))
+console.log("Eureka!", aToZ("Post Office", "Daria's House"))
+// console.log("Eureka!", aToZ("Post Office", "Grete's House"))
+// console.log("Eureka!", aToZ("Post Office", "Ernie's House"))
 // console.log(aToZ("Post Office", "Post Office"))
 // console.log(aToZ("Post Office", "Hospital"))
 
