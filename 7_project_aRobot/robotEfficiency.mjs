@@ -1,4 +1,5 @@
 'use strict';
+import {roadGraph, VillageState, runRobot, goalOrientedRobot} from './main.mjs'
 
 /* 2. Robot efficiency
     - Write a robot that finishes the delivery task faster than "goalOrientedRobot()"
@@ -36,31 +37,64 @@ Important Axioms:
 Output: Array -> "A list shorter than goalOrientedRobot()'s findRoute()"
 */
 
-import {roadGraph, VillageState, runRobot, goalOrientedRobot} from './main.mjs'
 
-// [Point A, Point B] -> "Shortest possible route expressed as a list"
-function getShortestRoute(pointA, pointB){
-    let routes = []
-    function findRoutes(pointA, pointB){
-        if (pointA != pointB){
-            for (let point of roadGraph[pointA]) {
-                findRoutes(point, pointB)
-                console.log(point)
+// helper function #1 - return shortest route from pointA to pointZ
+function aToZ(pointA, pointZ) {
+    // Security existential check
+    if ( Object.keys(roadGraph).some(point => point == pointA) == false ) throw new Error(`"${pointA}" does not exist`)
+    if ( Object.keys(roadGraph).some(point => roadGraph[point].some(end => end == pointZ)) == false ) throw new Error(`"${pointZ}" does not exist`)
+
+    // Return empty list if same point
+    if (pointA == pointZ) return []
+
+    //
+    let routeList = []
+    for (let point of roadGraph[pointA]) routeList.push([pointA, point])
+    console.log('routeList', routeList)
+
+    // Recursive function
+    function func(oldList) {
+        let newList = []
+        // algorithm
+        for (let route of oldList){
+            for (let destination of roadGraph[route[route.length - 1]]) {
+                // console.log(roadGraph[route[route.length - 1]], destination)
+                if ( oldList.every(route => route.every(point => destination != point))) newList.push([...route, destination])
             }
-        else
         }
-    }
-    return route
-}
+        console.log('newList', newList)
 
-console.log(getShortestRoute("Post Office", "Shop"))
+
+        // Return or recurse
+        if ( newList.some(route => route.some(point => point == pointZ) ) ) {
+            let filtered = newList.filter(route => route.some(point => point == pointZ))
+            console.log('filtered', filtered)
+            return filtered
+        }
+        else func(newList)
+        // else return newList
+    }
+
+    // debug
+
+    // Return the shortest route
+    return func(routeList).reduce((given, arr) => given.length <= arr.length ? given : arr)
+}
+console.log(aToZ("Post Office", "Daria's House"))
+// console.log(aToZ("Post Office", "Cabin"))
+// console.log(aToZ("Post Office", "Post Office"))
+// console.log(aToZ("Post Office", "Hospital"))
 
 // Robot
 function yourRobot({startingPlace, parcels}, memory){
+    // 1. For each parcel
 
+    // 2.
+
+    // 3.
 }
 
-// Run simulation
+// Test
 let sample = new VillageState (
     "Post Office",
     [
