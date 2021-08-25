@@ -39,7 +39,7 @@ Output: Array -> "A list shorter than goalOrientedRobot()'s findRoute()"
 
 
 // helper function #1 - return shortest route from pointA to pointZ
-function aToZ(pointA, pointZ) {
+function generateShortestRoute(pointA, pointZ) {
     // Security existential check
     if ( Object.keys(roadGraph).some(point => point == pointA) == false ) throw new Error(`"${pointA}" does not exist`)
     if ( Object.keys(roadGraph).some(point => roadGraph[point].some(end => end == pointZ)) == false ) throw new Error(`"${pointZ}" does not exist`)
@@ -47,59 +47,39 @@ function aToZ(pointA, pointZ) {
     // Return empty list if same point
     if (pointA == pointZ) return []
 
-    //
+    // Produce starting routes
     let routeList = []
     for (let point of roadGraph[pointA]) routeList.push([pointA, point])
-    // console.log('routeList', routeList)
 
     // Recursive function
-    let i = 0  // <- for debug
     function func(oldList) {
         let newList = []
         // algorithm
         for (let route of oldList){
             for (let destination of roadGraph[route[route.length - 1]]) {
-                // console.log(roadGraph[route[route.length - 1]], destination)
                 if ( oldList.every(route => route.every(point => destination != point))) newList.push([...route, destination])
             }
         }
-
-        // debug
-        i++
-        console.log(`iteration(s): ${i} -> newList`, newList)
-
         // Return or recurse
         if ( newList.some(route => route.some(point => point == pointZ)) ) {
             let filtered = newList.filter(route => route.some(point => point == pointZ))
-            console.log('filtered', typeof filtered, filtered)
             return filtered  // <- return list of routes only containing pointZ
         }
-        else func(newList)  // <- if newList does not contain pointZ, recurse until so
-        // else return newList
+        else return func(newList)  // <- if newList does not contain pointZ, recurse until so
     }
 
-    // debug
-
     // Return the shortest route
-    let filtered = func(routeList)
-    console.log('filtered', filtered)
-    return filtered.reduce((given, arr) => given.length <= arr.length ? given : arr)  // TODO: why tf does func() return undefined when routes.length > 4 ???
+    return func(routeList).reduce((given, arr) => given.length <= arr.length ? given : arr)
 }
-console.log("Eureka!", aToZ("Post Office", "Cabin"))
-console.log("Eureka!", aToZ("Post Office", "Farm"))
-console.log("Eureka!", aToZ("Post Office", "Daria's House"))
-// console.log("Eureka!", aToZ("Post Office", "Grete's House"))
-// console.log("Eureka!", aToZ("Post Office", "Ernie's House"))
-// console.log(aToZ("Post Office", "Post Office"))
-// console.log(aToZ("Post Office", "Hospital"))
 
 // Robot
-function yourRobot({startingPlace, parcels}, memory){
+function yourRobot({place, parcels}, route){
     // 1. For each parcel
 
     // 2.
 
     // 3.
+    return { direction: route[0], memory: route.slice(1) }
 }
 
 // Test
