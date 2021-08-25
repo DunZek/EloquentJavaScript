@@ -37,8 +37,20 @@ Important Axioms:
 Output: Array -> "A list shorter than goalOrientedRobot()'s findRoute()"
 */
 
+// Sample used
+let sample = new VillageState (
+    "Post Office",
+    [
+       { place: "Bob's House", address: "Cabin"},
+       { place: "Daria's House", address: 'Town Hall' },
+       { place: 'Post Office', address: "Bob's House" },
+       { place: 'Post Office', address: 'Town Hall' },
+        { place: 'Shop', address: 'Farm' }
+    ]
+)
 
-// helper function #1 - return shortest route from pointA to pointZ
+
+// helper function - "return shortest route from pointA to pointZ"
 function generateShortestRoute(pointA, pointZ) {
     // Security existential check
     if ( Object.keys(roadGraph).some(point => point == pointA) == false ) throw new Error(`"${pointA}" does not exist`)
@@ -54,9 +66,10 @@ function generateShortestRoute(pointA, pointZ) {
     // Recursive function
     function func(oldList) {
         let newList = []
-        // algorithm
+        // Algorithm
         for (let route of oldList){
             for (let destination of roadGraph[route[route.length - 1]]) {
+                // filter for redundacies
                 if ( oldList.every(route => route.every(point => destination != point))) newList.push([...route, destination])
             }
         }
@@ -72,24 +85,34 @@ function generateShortestRoute(pointA, pointZ) {
     return func(routeList).reduce((given, arr) => given.length <= arr.length ? given : arr)
 }
 
+
+// helper function - "produce n! combinations"
+function nFactorialCombos(itemArray) {
+    // Ready array
+    let combosArray = []
+    for (let item of itemArray) combosArray.push([item])
+
+    // Algorithm
+    for (let )
+
+    return combosArray
+}
+
+console.log(nFactorialCombos(['a', 'b', 'c']))  // 3! = 6 combinations
+// console.log(nFactorialCombos(sample.parcels))  // 5! = 120 combinations
+
+
 // Robot
 function yourRobot({place, parcels}, route){
+
     // 1. For each parcel
+    for (let parcel of parcels) {
 
-    // 2.
+    }
 
-    // 3.
+    // Move robot
     return { direction: route[0], memory: route.slice(1) }
 }
 
 // Test
-let sample = new VillageState (
-    "Post Office",
-    [
-//        { place: "Bob's House", address: "Cabin"},
-//        { place: "Daria's House", address: 'Town Hall' },
-//        { place: 'Post Office', address: "Bob's House" },
-//        { place: 'Post Office', address: 'Town Hall' },
-        { place: 'Shop', address: 'Farm' }
-    ])
 // runRobot(sample, yourRobot, [])
