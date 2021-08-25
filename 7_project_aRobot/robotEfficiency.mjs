@@ -87,27 +87,64 @@ function generateShortestRoute(pointA, pointZ) {
 
 
 // helper function - "produce n! combinations"
-function nFactorialCombos(itemArray) {
-    // Ready array
-    let combosArray = []
-    for (let item of itemArray) combosArray.push([item])
+function nFactorialCombos(items) {
+    // Return empty if given empty
+    if (items.length == 0) return items
 
-    // Algorithm
-    for (let )
+    // Recursively generate combinations to completion
+    function func(combinations) {
+        items.shift()  // remove and replace first item
+
+        // Append new item to previous combination
+        for (let i=0; i < combinations.length; i++) {
+            combinations[i].push(items[0])
+        }
+
+        // Shift to produce new combination
+        for (let i=0; i < combinations.length; i++) {
+
+        }
+        // Produce shifted variants
+        let shifted = []
+
+
+        // Append variants to array to complete new combinations
+
+
+
+        if (items.length == 0) {
+            return combinations
+        }
+        else return func(combinations)
+    }
 
     // inputArr -> "shifter" -> shiftedArr
-    let inputArr = ['a', 'b', 'c']
-    let shiftedArr = [...inputArr]
-    shiftedArr.push(shiftedArr[0])
-    shiftedArr.shift()
+    // let inputArr = ['a', 'b', 'c']
+    // let shiftedArr = [...inputArr]
+    // shiftedArr.push(shiftedArr[0])
+    // shiftedArr.shift()
 
-
-
-    return combosArray
+    return func([items[0]])
 }
 
-console.log(nFactorialCombos(['a', 'b', 'c']))  // 3! = 6 combinations
+// console.log(nFactorialCombos(['a']))  // 1! = 1 combination
+console.log(nFactorialCombos(['a', 'b']))  // 2! = 2 combination
+// console.log(nFactorialCombos(['a', 'b', 'c']))  // 3! = 6 combinations
+// console.log(nFactorialCombos(['a', 'b', 'c', 'd']))  // 4! = 24 combination
+// console.log(nFactorialCombos(['a', 'b', 'c', 'd', 'e']))  // 5! = 120 combination
 // console.log(nFactorialCombos(sample.parcels))  // 5! = 120 combinations
+
+/*
+1. Start
+    [ ['a'] ]
+2. Produce from ['a']
+    [ ['a', 'b'], ['b', 'a'] ]
+3. Produce from ['a', 'b'], ['b', 'a']
+    [
+        ['a', 'b', 'c'], ['b', 'c', 'a'], ['c', 'a', 'b']
+        ['b', 'a', 'c'], ['a', 'c', 'b'], ['c', 'b', 'a']
+    ]
+*/
 
 
 // Robot
