@@ -95,6 +95,14 @@ function nFactorialCombos(itemArray) {
     // Algorithm
     for (let )
 
+    // inputArr -> "shifter" -> shiftedArr
+    let inputArr = ['a', 'b', 'c']
+    let shiftedArr = [...inputArr]
+    shiftedArr.push(shiftedArr[0])
+    shiftedArr.shift()
+
+
+
     return combosArray
 }
 
