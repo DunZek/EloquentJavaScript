@@ -86,36 +86,53 @@ function generateShortestRoute(pointA, pointZ) {
 }
 
 
-// helper function - "produce n! combinations"
+// helper function - "produce and return array of n! combinations"
 function nFactorialCombos(items) {
-    // Return empty if given empty
+    // Return itself if given empty
     if (items.length == 0) return items
 
     // Recursively generate combinations to completion
     function func(combinations) {
         items.shift()  // remove and replace first item
 
-        // Append new item to previous combination
-        for (let i=0; i < combinations.length; i++) {
-            combinations[i].push(items[0])
-        }
-
-        // Shift to produce new combination
-        for (let i=0; i < combinations.length; i++) {
-
-        }
-        // Produce shifted variants
-        let shifted = []
-
-
-        // Append variants to array to complete new combinations
-
-
-
         if (items.length == 0) {
             return combinations
+        } else {
+
+            // Append new item to previous combination
+            for (let i=0; i < combinations.length; i++) {
+                combinations[i].push(items[0])
+            }
+
+            // console.log('appended', combinations)
+
+            /// Shift to produce new combination
+
+            // Produce shifted variants
+            let shiftedCombos = []
+            for (let combination of combinations) {
+                // produce copy and do the shifting
+                let shifted = [...combination]
+                for (let i=0; i < combination.length - 1; i++){
+                    shifted.push(shifted[0])
+                    shifted.shift()
+                    // push to container array
+                    shiftedCombos.push([...shifted])
+                    // console.log('shifted', shifted, 'using', combination)
+                }
+            }
+
+            // console.log('shiftedCombos', shiftedCombos)
+
+            // Append variants to array to complete new combinations
+            for (let combination of shiftedCombos) combinations.push(combination)
+
+            // console.log('result', combinations)
+
+            return func(combinations)
         }
-        else return func(combinations)
+
+        // else return combinations
     }
 
     // inputArr -> "shifter" -> shiftedArr
@@ -124,24 +141,29 @@ function nFactorialCombos(items) {
     // shiftedArr.push(shiftedArr[0])
     // shiftedArr.shift()
 
-    return func([items[0]])
+    // Return
+    return func([[items[0]]])
 }
 
 // console.log(nFactorialCombos(['a']))  // 1! = 1 combination
-console.log(nFactorialCombos(['a', 'b']))  // 2! = 2 combination
-// console.log(nFactorialCombos(['a', 'b', 'c']))  // 3! = 6 combinations
+// console.log('console.log:', nFactorialCombos(['a', 'b']))  // 2! = 2 combination
+// console.log('console.log:', nFactorialCombos(['a', 'b', 'c']))  // 3! = 6 combinations
 // console.log(nFactorialCombos(['a', 'b', 'c', 'd']))  // 4! = 24 combination
 // console.log(nFactorialCombos(['a', 'b', 'c', 'd', 'e']))  // 5! = 120 combination
-// console.log(nFactorialCombos(sample.parcels))  // 5! = 120 combinations
+console.log(nFactorialCombos(sample.parcels))  // 5! = 120 combinations
 
 /*
 1. Start
-    [ ['a'] ]
+    [
+        ['a']
+    ]
 2. Produce from ['a']
-    [ ['a', 'b'], ['b', 'a'] ]
+    [
+        ['a', 'b'], ['b', 'a']
+    ]
 3. Produce from ['a', 'b'], ['b', 'a']
     [
-        ['a', 'b', 'c'], ['b', 'c', 'a'], ['c', 'a', 'b']
+        ['a', 'b', 'c'], ['b', 'c', 'a'], ['c', 'a', 'b'],
         ['b', 'a', 'c'], ['a', 'c', 'b'], ['c', 'b', 'a']
     ]
 */
