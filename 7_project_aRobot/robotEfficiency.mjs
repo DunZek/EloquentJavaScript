@@ -50,43 +50,7 @@ let sample = new VillageState (
 )
 
 
-// helper function - "return shortest route from pointA to pointZ"
-function generateShortestRoute(pointA, pointZ) {
-    // Security existential check
-    if ( Object.keys(roadGraph).some(point => point == pointA) == false ) throw new Error(`"${pointA}" does not exist`)
-    if ( Object.keys(roadGraph).some(point => roadGraph[point].some(end => end == pointZ)) == false ) throw new Error(`"${pointZ}" does not exist`)
-
-    // Return empty list if same point
-    if (pointA == pointZ) return []
-
-    // Produce starting routes
-    let routeList = []
-    for (let point of roadGraph[pointA]) routeList.push([pointA, point])
-
-    // Recursive function
-    function func(oldList) {
-        let newList = []
-        // Algorithm
-        for (let route of oldList){
-            for (let destination of roadGraph[route[route.length - 1]]) {
-                // filter for redundacies
-                if ( oldList.every(route => route.every(point => destination != point))) newList.push([...route, destination])
-            }
-        }
-        // Return or recurse
-        if ( newList.some(route => route.some(point => point == pointZ)) ) {
-            let filtered = newList.filter(route => route.some(point => point == pointZ))
-            return filtered  // <- return list of routes only containing pointZ
-        }
-        else return func(newList)  // <- if newList does not contain pointZ, recurse until so
-    }
-
-    // Return the shortest route
-    return func(routeList).reduce((given, arr) => given.length <= arr.length ? given : arr)
-}
-
-
-// helper function - "produce and return array of n! permutations"
+// finished 2021-08-25: helper function - "produce and return array of n! permutations"
 function nFactorialPermutations(items) {
     // Return itself if given empty
     if (items.length == 0) return items
@@ -130,16 +94,76 @@ function nFactorialPermutations(items) {
     return func([[items[0]]])
 }
 
-// Robot
-function yourRobot({place, parcels}, route){
 
-    // 1. For each parcel
-    for (let parcel of parcels) {
+// finished 2021-08-26: helper function - "return all possible routes from pointA to pointZ"
+function getBestPossibleRoutes(pointA, pointZ) {
+    // Security existential check
+    if ( Object.keys(roadGraph).some(point => point == pointA) == false ) throw new Error(`"${pointA}" does not exist`)
+    if ( Object.keys(roadGraph).some(point => roadGraph[point].some(end => end == pointZ)) == false ) throw new Error(`"${pointZ}" does not exist`)
 
+    // Return empty list if same point
+    if (pointA == pointZ) return []
+
+    // Use pre-determine turn average of goalOrientedRobot as limiter
+    const avg = 15
+
+    // Produce starting routes
+    let routeList = []
+    for (let point of roadGraph[pointA]) routeList.push([pointA, point])
+
+    // Recursive function
+    let i = 2  //
+    function func(oldList) {
+        let newList = []
+        // Algorithm for generating next destination of routes list
+        for (let route of oldList){
+            let lastPoint = route[route.length - 1]
+            // copy unchanged into newList if the last point of the given route is already pointZ
+            if (lastPoint == pointZ) {
+                newList.push([...route])
+                continue  // and then skip to the next route
+            }
+            // otherwise proceed
+            for (let destination of roadGraph[lastPoint]) {
+                // filter to make sure routes do not repetitively go back and forth
+                if (destination != route[route.length - 2]) newList.push([...route, destination])
+            }
+        }
+        // Return when pointZ found or recurse otherwise
+        i++;            // return newList
+
+        if (i == avg) {
+            let filtered = newList.filter(route => route[route.length - 1] == pointZ)
+            return filtered  // <- return list of routes where the last point is pointZ
+        }
+        else return func(newList)  // <- if newList does not contain pointZ, recurse until so
     }
 
-    // Move robot
-    return { direction: route[0], memory: route.slice(1) }
+    // Return the best list of possible routes from pointA to pointZ, whose lengths are limited by the turn average of goalOrientedRobot
+    return func(routeList)
+}
+
+
+// progenitor function (2021-08-24) updated -> wrapper function of its own derivative (2021-08-24)
+// - "return shortest route from all possible routes of pointA to pointZ"
+function getShortestRoute(pointA, pointZ) {
+    return getBestPossibleRoutes(pointA, pointZ).reduce((given, arr) => given.length <= arr.length ? given : arr)
+}
+
+
+// Main algorithm
+function bruteForceFindRoute(state) {
+
+    return
+}
+
+// Robot
+function yourRobot(state, memory = []){
+    // generate a route if none already given and if there are still parcels
+    if (memory.length == 0 && state.parcels.length != 0) memory = bruteForceFindRoute(state)
+
+    // move robot
+    return { direction: memory[0], memory: memory.slice(1) }
 }
 
 // Test
