@@ -86,88 +86,49 @@ function generateShortestRoute(pointA, pointZ) {
 }
 
 
-// helper function - "produce and return array of n! combinations"
-function nFactorialCombos(items) {
+// helper function - "produce and return array of n! permutations"
+function nFactorialPermutations(items) {
     // Return itself if given empty
     if (items.length == 0) return items
 
-    // Recursively generate combinations to completion
-    function func(combinations) {
+    // Recursively generate permutations to completion
+    function func(permutations) {
         items.shift()  // remove and replace first item
 
         if (items.length == 0) {
-            return combinations
+            // if done, escape recursion and return result
+            return permutations
         } else {
 
-            // Append new item to previous combination
-            for (let i=0; i < combinations.length; i++) {
-                combinations[i].push(items[0])
+            // Append new item to previous permutation
+            for (let i=0; i < permutations.length; i++) {
+                permutations[i].push(items[0])
             }
 
-            // console.log('appended', combinations)
-
-            /// Shift to produce new combination
-
+            /// Shift to produce new permutation
             // Produce shifted variants
-            let shiftedCombos = []
-            for (let combination of combinations) {
+            let shiftedPermutations = []
+            for (let permutation of permutations) {
                 // produce copy and do the shifting
-                let shifted = [...combination]
-                for (let i=0; i < combination.length - 1; i++){
+                let shifted = [...permutation]
+                for (let i=0; i < permutation.length - 1; i++){
                     shifted.push(shifted[0])
                     shifted.shift()
-                    // push to container array
-                    shiftedCombos.push([...shifted])
-                    // console.log('shifted', shifted, 'using', combination)
+                    // push copy of contents to container array
+                    shiftedPermutations.push([...shifted])
                 }
             }
+            // Append variants to array to complete new permutations
+            for (let permutation of shiftedPermutations) permutations.push(permutation)
 
-            // console.log('shiftedCombos', shiftedCombos)
-
-            // Append variants to array to complete new combinations
-            for (let combination of shiftedCombos) combinations.push(combination)
-
-            // console.log('result', combinations)
-
-            return func(combinations)
+            // Recurse
+            return func(permutations)
         }
-
-        // else return combinations
     }
-
-    // inputArr -> "shifter" -> shiftedArr
-    // let inputArr = ['a', 'b', 'c']
-    // let shiftedArr = [...inputArr]
-    // shiftedArr.push(shiftedArr[0])
-    // shiftedArr.shift()
 
     // Return
     return func([[items[0]]])
 }
-
-// console.log(nFactorialCombos(['a']))  // 1! = 1 combination
-// console.log('console.log:', nFactorialCombos(['a', 'b']))  // 2! = 2 combination
-// console.log('console.log:', nFactorialCombos(['a', 'b', 'c']))  // 3! = 6 combinations
-// console.log(nFactorialCombos(['a', 'b', 'c', 'd']))  // 4! = 24 combination
-// console.log(nFactorialCombos(['a', 'b', 'c', 'd', 'e']))  // 5! = 120 combination
-console.log(nFactorialCombos(sample.parcels))  // 5! = 120 combinations
-
-/*
-1. Start
-    [
-        ['a']
-    ]
-2. Produce from ['a']
-    [
-        ['a', 'b'], ['b', 'a']
-    ]
-3. Produce from ['a', 'b'], ['b', 'a']
-    [
-        ['a', 'b', 'c'], ['b', 'c', 'a'], ['c', 'a', 'b'],
-        ['b', 'a', 'c'], ['a', 'c', 'b'], ['c', 'b', 'a']
-    ]
-*/
-
 
 // Robot
 function yourRobot({place, parcels}, route){
