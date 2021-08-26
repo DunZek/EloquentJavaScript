@@ -45,7 +45,7 @@ let sample = new VillageState (
        { place: "Daria's House", address: 'Town Hall' },
        { place: 'Post Office', address: "Bob's House" },
        { place: 'Post Office', address: 'Town Hall' },
-        { place: 'Shop', address: 'Farm' }
+       { place: 'Shop', address: 'Farm' }
     ]
 )
 
@@ -145,22 +145,42 @@ function getBestPossibleRoutes(pointA, pointZ) {
 
 
 // progenitor function (2021-08-24) updated -> wrapper function of its own derivative (2021-08-24)
-// - "return shortest route from all possible routes of pointA to pointZ"
-function getShortestRoute(pointA, pointZ) {
-    return getBestPossibleRoutes(pointA, pointZ).reduce((given, arr) => given.length <= arr.length ? given : arr)
+// - "return shortest route from the given list of routes"
+function getShortestRoute(routes) {
+    return routes.reduce((given, arr) => given.length <= arr.length ? given : arr)
 }
 
 
 // Main algorithm
 function bruteForceFindRoute(state) {
+    let memories = []
 
-    return
+    // Generate all possible order permutations of parcel delivery
+    let deliveryPermutations = nFactorialPermutations(state.parcels)
+
+    // Generate all possible and viable routes for delivering parcels
+    for (let parcels of deliveryPermutations) {
+        let memory = []
+        for (let parcel of parcels) {
+            let routes = []
+            for (let route of getBestPossibleRoutes(parcel.place, parcel.address)) {
+                routes.push(route)
+            }
+            memory.push(routes)
+        }
+        memories.push(memories)
+    }
+
+    // Return the shortest route from the list of all possible and viable routes
+    return getShortestRoute(memories)
 }
+
+console.log(bruteForceFindRoute(sample))
 
 // Robot
 function yourRobot(state, memory = []){
     // generate a route if none already given and if there are still parcels
-    if (memory.length == 0 && state.parcels.length != 0) memory = bruteForceFindRoute(state)
+    if (memory.length == 0 && state.parcels.length != 0) memory = bruteForceFindRoute(state).slice(1)
 
     // move robot
     return { direction: memory[0], memory: memory.slice(1) }
