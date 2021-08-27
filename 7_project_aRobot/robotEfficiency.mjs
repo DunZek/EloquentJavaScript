@@ -37,7 +37,7 @@ Important Axioms:
 Output: Array -> "A list shorter than goalOrientedRobot()'s findRoute()"
 */
 
-// Sample used
+// Sample - beat goalOrientedRobot
 const sample1 = new VillageState (
     "Post Office",
     [
@@ -49,6 +49,7 @@ const sample1 = new VillageState (
     ]
 )
 
+// Sample - optimization problem
 const sample2 = new VillageState (
     "Post Office",
     [
@@ -60,6 +61,17 @@ const sample2 = new VillageState (
     ]
 )
 
+// Sample - stuck!!
+const sample3 = new VillageState(
+    "Post Office",
+    [
+        { place: "Marketplace", address: "Cabin"},
+        { place: "Post Office", address: "Grete's House"},
+        { place: "Ernie's House", address: "Farm"},
+        { place: "Ernie's House", address: "Alice's House"},
+        { place: "Farm", address: "Bob's House"}
+    ]
+)
 
 // finished 2021-08-25: helper function - "produce and return array of n! permutations"
 function nFactorialPermutations(items) {
@@ -193,7 +205,10 @@ function bruteForceFindRoute(state) {
             }
             // Delivery sensor
             for (let parcel of permutation) {
-                if (memory.includes(parcel.address) && memory.includes(parcel.place)) delivered.push(parcel)
+                if (memory.includes(parcel.address) && memory.includes(parcel.place)) {
+                    if (memory[memory.indexOf(parcel.place)] < memory[memory.indexOf(parcel.address)])
+                    delivered.push(parcel)
+                }
             }
         }
         memories.push(memory)
@@ -214,23 +229,18 @@ function bruteForceFindRouteRobot(state, memory){
 }
 
 // Tests
-runRobot(sample2, bruteForceFindRouteRobot, [])
-/*
-Diagnosis:
-    using permutation:
-	1. { place: "Cabin", address: "Alice's House" },         // 1. address: Alice's House
-    2. { place: "Bob's House", address: "Daria's House"},
-    3. { place: "Alice's House", address: "Ernie's House" }, // 2. place: Alice's House ->
-    4. { place: "Daria's House", address: "Shop" },
-    5. { place: "Daria's House", address: "Alice's House" }  <- unable to deliver: "sensed as delivered by bruteForceFindRoute()"
+// 11: [ M S G F G E D T B A C ]
+runRobot(sample3, bruteForceFindRouteRobot, [])
+// 15: [ A B T D E D T S T D T B A C A ]
+runRobot(sample3, bruteForceFindRouteRobot, [])
+// : [  ]
+runRobot(sample3, bruteForceFindRouteRobot, [])
 
-    resulting length:
-    [ A C A B T D E D T S ]  // 10
-*/
 
 // runRobot(sample, routeRobot, [])
 // runRobot(sample, routeRobot, route)
 // runRobot(sample, goalOrientedRobot, [])
-// 208 lines used, thus at most 208 lines of code.
 
+
+// ... lines used, thus at most ... lines of code.
 export {bruteForceFindRouteRobot}
