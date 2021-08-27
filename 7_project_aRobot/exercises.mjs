@@ -2,6 +2,7 @@
 
 // Dependencies
 import {VillageState, routeRobot, goalOrientedRobot, runRobot} from './main.mjs'
+import {bruteForceFindRouteRobot} from './robotEfficiency.mjs'
 
 /* 1. Measuring a robot
     - Write a compareRobots():
@@ -28,8 +29,8 @@ function compareRobots(robots, memories){
     // Generate the list of simulations to run through
     let villages = []
     for (let i=0; i<100; i++) villages.push(new VillageState.random())
-    console.log(villages.length)
-    console.log(villages[0])
+    // console.log(villages.length)
+    // console.log(villages[0])
 
     // Run each robot
     for (let robot of robots){
@@ -57,8 +58,8 @@ function myRunRobot(state, robot, memory){
     }
 }
 
-console.log(compareRobots([routeRobot, goalOrientedRobot], [[], []]))
-
+// console.log(compareRobots([routeRobot, goalOrientedRobot], [[], []]))
+console.log('goalOrientedRobot & bruteForceFindRouteRobot', compareRobots([goalOrientedRobot, bruteForceFindRouteRobot], [[], []]))
 
 /* 2. Robot efficiency
     - Write a robot that finishes the delivery task faster than "goalOrientedRobot()"
@@ -95,21 +96,7 @@ Important Axioms:
 
 Output: Array -> "A list shorter than goalOrientedRobot()'s findRoute()"
 */
-function yourRobot(){
 
-}
-
-let sampleVillage = new VillageState (
-    "Post Office",
-    [
-        { place: "Bob's House", address: "Cabin"},
-        { place: "Daria's House", address: 'Town Hall' },
-        { place: 'Post Office', address: "Bob's House" },
-        { place: 'Post Office', address: 'Town Hall' },
-        { place: 'Shop', address: 'Farm' }
-    ]
-)
-
-runRobot(sampleVillage, yourRobot, memory)
+// runRobot(sampleVillage, yourRobot, memory)
 
 /* 3. Persistent group */
