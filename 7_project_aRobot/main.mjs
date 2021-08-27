@@ -93,6 +93,7 @@ function runRobot(state, robot, memory){  // VillageState, predicate-function, m
         state = state.move(action.direction)
         memory = action.memory
         console.log(`Moved to ${action.direction}`)
+        // console.log(state)
     }
 }
 
