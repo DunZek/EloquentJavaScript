@@ -1,5 +1,5 @@
 'use strict';
-import {roadGraph, VillageState, runRobot, goalOrientedRobot} from './main.mjs'
+import {roadGraph, VillageState, runRobot, routeRobot, goalOrientedRobot} from './main.mjs'
 
 /* 2. Robot efficiency
     - Write a robot that finishes the delivery task faster than "goalOrientedRobot()"
@@ -38,14 +38,25 @@ Output: Array -> "A list shorter than goalOrientedRobot()'s findRoute()"
 */
 
 // Sample used
-let sample = new VillageState (
+const sample1 = new VillageState (
     "Post Office",
     [
-       { place: "Bob's House", address: "Cabin"},
+       { place: "Bob's House", address: "Cabin" },
        { place: "Daria's House", address: 'Town Hall' },
        { place: 'Post Office', address: "Bob's House" },
        { place: 'Post Office', address: 'Town Hall' },
        { place: 'Shop', address: 'Farm' }
+    ]
+)
+
+const sample2 = new VillageState (
+    "Post Office",
+    [
+        { place: "Alice's House", address: "Ernie's House" },  // 2. place: "Alice's House" in delivered
+        { place: "Daria's House", address: "Alice's House" },  // <- unable to be delivered therefore
+        { place: "Daria's House", address: "Shop" },
+        { place: "Cabin", address: "Alice's House" },          // 1. address: "Alice's House" in delivered
+        { place: "Bob's House", address: "Daria's House"}
     ]
 )
 
@@ -153,38 +164,73 @@ function getShortestRoute(routes) {
 
 // Main algorithm
 function bruteForceFindRoute(state) {
-    let memories = []
 
-    // Generate all possible order permutations of parcel delivery
+    // #1: Generate every permutation of delivery
     let deliveryPermutations = nFactorialPermutations(state.parcels)
 
-    // Generate all possible and viable routes for delivering parcels
-    for (let parcels of deliveryPermutations) {
+    // #2: Generate the memory of each delivery permutation
+    let memories = []
+    for (let permutation of deliveryPermutations) {
         let memory = []
-        for (let parcel of parcels) {
-            let routes = []
-            for (let route of getBestPossibleRoutes(parcel.place, parcel.address)) {
-                routes.push(route)
+        let delivered = []  // to compensate for runtime delivery
+        // -> Generate the shortest route for each memory
+        let current = state.place
+        for (let parcel of permutation) {
+            // Skip parcel if already delivered
+            if (delivered.includes(parcel)) continue
+            // Otherwise...
+            if ((memory.length == 0 || memory[memory.length - 1] != parcel.place) && current != parcel.place) {
+                // From current, go to parcel
+                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.place)).slice(1))
+                current = parcel.place
+                // From current, go to address
+                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
+                current = parcel.address
+            } else if (memory[memory.length - 1] == parcel.place) {
+                // From current, go to address
+                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
+                current = parcel.address
             }
-            memory.push(routes)
+            // Delivery sensor
+            for (let parcel of permutation) {
+                if (memory.includes(parcel.address) && memory.includes(parcel.place)) delivered.push(parcel)
+            }
         }
-        memories.push(memories)
+        memories.push(memory)
     }
 
-    // Return the shortest route from the list of all possible and viable routes
+    // #3: Return the shortest memory
     return getShortestRoute(memories)
 }
 
-console.log(bruteForceFindRoute(sample))
 
 // Robot
-function yourRobot(state, memory = []){
+function bruteForceFindRouteRobot(state, memory){
     // generate a route if none already given and if there are still parcels
-    if (memory.length == 0 && state.parcels.length != 0) memory = bruteForceFindRoute(state).slice(1)
+    if (memory.length == 0) memory = bruteForceFindRoute(JSON.parse(JSON.stringify(state)))
 
     // move robot
     return { direction: memory[0], memory: memory.slice(1) }
 }
 
-// Test
-// runRobot(sample, yourRobot, [])
+// Tests
+runRobot(sample2, bruteForceFindRouteRobot, [])
+/*
+Diagnosis:
+    using permutation:
+	1. { place: "Cabin", address: "Alice's House" },         // 1. address: Alice's House
+    2. { place: "Bob's House", address: "Daria's House"},
+    3. { place: "Alice's House", address: "Ernie's House" }, // 2. place: Alice's House ->
+    4. { place: "Daria's House", address: "Shop" },
+    5. { place: "Daria's House", address: "Alice's House" }  <- unable to deliver: "sensed as delivered by bruteForceFindRoute()"
+
+    resulting length:
+    [ A C A B T D E D T S ]  // 10
+*/
+
+// runRobot(sample, routeRobot, [])
+// runRobot(sample, routeRobot, route)
+// runRobot(sample, goalOrientedRobot, [])
+// 208 lines used, thus at most 208 lines of code.
+
+export {bruteForceFindRouteRobot}
