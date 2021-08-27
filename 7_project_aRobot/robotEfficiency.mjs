@@ -48,6 +48,11 @@ const sample1 = new VillageState (
        { place: 'Shop', address: 'Farm' }
     ]
 )
+// hypothetical best route to sample1 - 11 turns
+const route1 = [
+    "Marketplace", "Shop", "Grete's House", "Farm", "Grete's House", "Ernie's House",
+    "Daria's House", "Town Hall", "Bob's House", "Alice's House", "Cabin"
+]
 
 // Sample - optimization problem
 const sample2 = new VillageState (
@@ -60,18 +65,29 @@ const sample2 = new VillageState (
         { place: "Bob's House", address: "Daria's House"}
     ]
 )
+// hypothetical best route to sample2 -
+const route2 = [
+    "Alice's House", "Cabin", "Alice's House", "Bob's House", "Town Hall",
+    "Daria's House", "Ernie's House", "Grete's House", "Shop", "Town Hall",
+    "Bob's House", "Alice's House"
+]
 
-// Sample - stuck!!
+// Sample - optimization problem
 const sample3 = new VillageState(
     "Post Office",
     [
         { place: "Marketplace", address: "Cabin"},
-        { place: "Post Office", address: "Grete's House"},
-        { place: "Ernie's House", address: "Farm"},
+        { place: "Post Office", address: "Grete's House"},  // <- never returned
+        { place: "Ernie's House", address: "Farm"},  // <- never returned
         { place: "Ernie's House", address: "Alice's House"},
         { place: "Farm", address: "Bob's House"}
     ]
 )
+// hypothetical best route to sample3 - 11
+const route3 = [
+	"Marketplace", "Shop", "Grete's House", "Ernie's House", "Grete's House",
+  	"Farm", "Marketplace", "Town Hall", "Bob's House", "Alice's House", "Cabin"
+]
 
 // finished 2021-08-25: helper function - "produce and return array of n! permutations"
 function nFactorialPermutations(items) {
@@ -187,7 +203,9 @@ function bruteForceFindRoute(state) {
         let delivered = []  // to compensate for runtime delivery
         // -> Generate the shortest route for each memory
         let current = state.place
-        for (let parcel of permutation) {
+        for (let i=0; i < permutation.length; i++) {
+            let parcel = permutation[i]
+        // for (let parcel of permutation) {
             // Skip parcel if already delivered
             if (delivered.includes(parcel)) continue
             // Otherwise...
@@ -204,10 +222,10 @@ function bruteForceFindRoute(state) {
                 current = parcel.address
             }
             // Delivery sensor
-            for (let parcel of permutation) {
+            for (let j=0; j < i; j++) {
+                let parcel = permutation[j]
                 if (memory.includes(parcel.address) && memory.includes(parcel.place)) {
-                    if (memory[memory.indexOf(parcel.place)] < memory[memory.indexOf(parcel.address)])
-                    delivered.push(parcel)
+                    if (memory[memory.indexOf(parcel.place)] < memory[memory.indexOf(parcel.address)]) delivered.push(parcel)
                 }
             }
         }
@@ -229,11 +247,11 @@ function bruteForceFindRouteRobot(state, memory){
 }
 
 // Tests
-// 11: [ M S G F G E D T B A C ]
-runRobot(sample3, bruteForceFindRouteRobot, [])
-// 15: [ A B T D E D T S T D T B A C A ]
-runRobot(sample3, bruteForceFindRouteRobot, [])
-// : [  ]
+// 11: [ M S G F G E D T B A C ] - finished 2021-08-19 to 2021-08-26
+// runRobot(sample1, bruteForceFindRouteRobot, [])
+// 16: [ A C A B T D T B A B T D E D T S ] - finished 2021-08-26 to 2021-08-26 (unoptimized)
+// runRobot(sample2, bruteForceFindRouteRobot, [])
+// 17: [ M F M T B T D E G F G E D T B A P M P A C ] - finished 2021-08-26 to 2021-08-27 (unoptimized)
 runRobot(sample3, bruteForceFindRouteRobot, [])
 
 
