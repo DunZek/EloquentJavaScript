@@ -65,7 +65,7 @@ const sample2 = new VillageState (
         { place: "Bob's House", address: "Daria's House"}
     ]
 )
-// hypothetical best route to sample2 -
+// hypothetical best route to sample2 - 12 turns
 const route2 = [
     "Alice's House", "Cabin", "Alice's House", "Bob's House", "Town Hall",
     "Daria's House", "Ernie's House", "Grete's House", "Shop", "Town Hall",
@@ -83,7 +83,7 @@ const sample3 = new VillageState(
         { place: "Farm", address: "Bob's House"}
     ]
 )
-// hypothetical best route to sample3 - 11
+// hypothetical best route to sample3 - 11 turns
 const route3 = [
 	"Marketplace", "Shop", "Grete's House", "Ernie's House", "Grete's House",
   	"Farm", "Marketplace", "Town Hall", "Bob's House", "Alice's House", "Cabin"
