@@ -1,5 +1,6 @@
 'use strict';
 import {roadGraph, VillageState, runRobot, routeRobot, goalOrientedRobot} from './main.mjs'
+import util from 'util'
 
 /* 2. Robot efficiency
     - Write a robot that finishes the delivery task faster than "goalOrientedRobot()"
@@ -237,6 +238,73 @@ function bruteForceFindRoute(state) {
 }
 
 
+// Debug algorithm - "return {permutation, solution}" - to generate insight from the algorithms
+function bruteForceFindRouteDebug(state) {
+
+    // #1: Generate every permutation of delivery
+    let deliveryPermutations = nFactorialPermutations(state.parcels)
+
+    // #2: Generate the memory of each delivery permutation
+    let results = []
+    for (let permutation of deliveryPermutations) {
+        let memory = []
+        let delivered = []  // to compensate for runtime delivery
+        // -> Generate the shortest route for each memory
+        let current = state.place
+        for (let i=0; i < permutation.length; i++) {
+            let parcel = permutation[i]
+        // for (let parcel of permutation) {
+            // Skip parcel if already delivered
+            if (delivered.includes(parcel)) continue
+            // Otherwise...
+            if ((memory.length == 0 || memory[memory.length - 1] != parcel.place) && current != parcel.place) {
+                // From current, go to parcel
+                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.place)).slice(1))
+                current = parcel.place
+                // From current, go to address
+                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
+                current = parcel.address
+            } else if (memory[memory.length - 1] == parcel.place) {
+                // From current, go to address
+                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
+                current = parcel.address
+            }
+            // Delivery sensor
+            for (let j=0; j < i; j++) {
+                let parcel = permutation[j]
+                if (memory.includes(parcel.address) && memory.includes(parcel.place)) {
+                    if (memory[memory.indexOf(parcel.place)] < memory[memory.indexOf(parcel.address)]) delivered.push(parcel)
+                }
+            }
+        }
+        results.push({permutation, memory})
+    }
+
+    // Generate memories
+    let memories = []
+    for (let obj of results) memories.push(obj.memory)
+
+    console.log(results.filter(obj => util.isDeepStrictEqual(obj.permutation, [
+        { place: 'Shop', address: "Farm" },
+        { place: "Daria's House", address: 'Town Hall' },
+        { place: 'Post Office', address: 'Town Hall' },
+        { place: "Post Office", address: "Bob's House" },
+        { place: "Bob's House", address: 'Cabin' }
+    ]))[0])
+
+    // console.log(results[0])
+
+    // Shortest memory
+    let shortestMemory = getShortestRoute(memories)
+
+    // Return object
+    return results.filter(obj => obj.memory == shortestMemory)[0]
+}
+
+console.log(bruteForceFindRouteDebug(sample1))
+// bruteForceFindRouteDebug(sample1)
+// console.log(bruteForceFindRoute(sample2).length)
+
 // Robot
 function bruteForceFindRouteRobot(state, memory){
     // generate a route if none already given and if there are still parcels
@@ -246,13 +314,39 @@ function bruteForceFindRouteRobot(state, memory){
     return { direction: memory[0], memory: memory.slice(1) }
 }
 
-// Tests
+/* Tests */
+/*
+Permutation:
+    {place: "Post Office", address: "Bob's House"},
+    {place: "Post ", address: ""},
+    {place: "", address: ""},
+    {place: "", address: ""},
+    {place: "", address: ""}
+*/
 // 11: [ M S G F G E D T B A C ] - finished 2021-08-19 to 2021-08-26
 // runRobot(sample1, bruteForceFindRouteRobot, [])
+
+/*
+Permutation:
+    {place: "Cabin", address: "Alice's House"},
+    {place: "Bob's House", address: "Daria's House"},
+    {place: "Daria's House", address: "Alice's House"},
+    {place: "Alice's House", address: "Ernie's House"},
+    {place: "Daria's House", address: "Shop"}
+*/
 // 16: [ A C A B T D T B A B T D E D T S ] - finished 2021-08-26 to 2021-08-26 (unoptimized)
 // runRobot(sample2, bruteForceFindRouteRobot, [])
+
+/*
+Permutation:
+    {place: "", address: ""},
+    {place: "", address: ""},
+    {place: "", address: ""},
+    {place: "", address: ""},
+    {place: "", address: ""}
+*/
 // 17: [ M F M T B T D E G F G E D T B A P M P A C ] - finished 2021-08-26 to 2021-08-27 (unoptimized)
-runRobot(sample3, bruteForceFindRouteRobot, [])
+// runRobot(sample3, bruteForceFindRouteRobot, [])
 
 
 // runRobot(sample, routeRobot, [])
