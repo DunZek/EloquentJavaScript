@@ -63,7 +63,7 @@ const sample2 = new VillageState (
         { place: "Daria's House", address: "Alice's House" },  // <- unable to be delivered therefore
         { place: "Daria's House", address: "Shop" },
         { place: "Cabin", address: "Alice's House" },          // 1. address: "Alice's House" in delivered
-        { place: "Bob's House", address: "Daria's House"}
+        { place: "Bob's House", address: "Daria's House" }
     ]
 )
 // hypothetical best route to sample2 - 12 turns
@@ -77,11 +77,11 @@ const route2 = [
 const sample3 = new VillageState(
     "Post Office",
     [
-        { place: "Marketplace", address: "Cabin"},
-        { place: "Post Office", address: "Grete's House"},  // <- never returned
-        { place: "Ernie's House", address: "Farm"},  // <- never returned
-        { place: "Ernie's House", address: "Alice's House"},
-        { place: "Farm", address: "Bob's House"}
+        { place: "Marketplace", address: "Cabin" },
+        { place: "Post Office", address: "Grete's House" },  // <- never returned
+        { place: "Ernie's House", address: "Farm" },  // <- never returned
+        { place: "Ernie's House", address: "Alice's House" },
+        { place: "Farm", address: "Bob's House" }
     ]
 )
 // hypothetical best route to sample3 - 11 turns
@@ -89,6 +89,17 @@ const route3 = [
 	"Marketplace", "Shop", "Grete's House", "Ernie's House", "Grete's House",
   	"Farm", "Marketplace", "Town Hall", "Bob's House", "Alice's House", "Cabin"
 ]
+// Sample - algorithm oversight
+const sample4 = new VillageState(
+    "Post Office",
+    [
+        { place: "Post Office", address: "Cabin" },
+        { place: "Post Office", address: "Town Hall" },
+        { place: "Post Office", address: "Farm" },
+        { place: "Post Office", address: "Shop" },
+        { place: "Post Office", address: "Marketplace" }
+    ]
+)
 
 // finished 2021-08-25: helper function - "produce and return array of n! permutations"
 function nFactorialPermutations(items) {
@@ -206,7 +217,6 @@ function bruteForceFindRoute(state) {
         let current = state.place
         for (let i=0; i < permutation.length; i++) {
             let parcel = permutation[i]
-        // for (let parcel of permutation) {
             // Skip parcel if already delivered
             if (delivered.includes(parcel)) continue
             // Otherwise...
@@ -245,30 +255,57 @@ function bruteForceFindRouteDebug(state) {
     let deliveryPermutations = nFactorialPermutations(state.parcels)
 
     // #2: Generate the memory of each delivery permutation
+    // Debug
+    const sample1Permutation = [
+        { place: 'Post Office', address: "Bob's House" },
+        { place: 'Post Office', address: 'Town Hall' },
+        { place: 'Shop', address: 'Farm' },
+        { place: "Daria's House", address: 'Town Hall' },
+        { place: "Bob's House", address: 'Cabin' }
+    ]
+    const sample4Permutation = [
+        { place: "Post Office", address: "Cabin" },
+        { place: "Post Office", address: "Town Hall" },
+        { place: "Post Office", address: "Farm" },
+        { place: "Post Office", address: "Shop" },
+        { place: "Post Office", address: "Marketplace" }
+    ]
     let results = []
     for (let permutation of deliveryPermutations) {
         let memory = []
-        let delivered = []  // to compensate for runtime delivery
+        // to compensate for runtime delivery
+        let delivered = []
+        let carried = []
         // -> Generate the shortest route for each memory
         let current = state.place
         for (let i=0; i < permutation.length; i++) {
+            // Carried sensor
+            for (let i=0; i < permutation.length; i++) {
+                let parcel = permutation[i]
+                // remove from carried if already delivered
+                if (delivered.some(obj => util.isDeepStrictEqual(obj, parcel))) carried.pop(parcel)
+                // add to carried if "picked up" and not already added
+                else if (current == parcel.place && !(carried.some(obj => util.isDeepStrictEqual(obj, parcel)))) carried.push(parcel)
+            }
             let parcel = permutation[i]
-        // for (let parcel of permutation) {
+            // if (util.isDeepStrictEqual(permutation, sample4Permutation)) console.log('current parcel', parcel, ':')
             // Skip parcel if already delivered
             if (delivered.includes(parcel)) continue
-            // Otherwise...
-            if ((memory.length == 0 || memory[memory.length - 1] != parcel.place) && current != parcel.place) {
+            // 
+            if (current == parcel.place || carried.some(obj => util.isDeepStrictEqual(obj, parcel)) {
+                // From current, go to address
+                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
+                // if (util.isDeepStrictEqual(permutation, sample4Permutation)) console.log('from current, to address', memory)
+            }
+            // Otherwise, if both starting or last traveresed isn't current parcel's location, and current location isn
+            else if (memory.length == 0 || current != parcel.place) {
                 // From current, go to parcel
                 memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.place)).slice(1))
-                current = parcel.place
                 // From current, go to address
                 memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
-                current = parcel.address
-            } else if (memory[memory.length - 1] == parcel.place) {
-                // From current, go to address
-                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
-                current = parcel.address
+                // if (util.isDeepStrictEqual(permutation, sample4Permutation)) console.log('from current, to parcel, to address', memory)
             }
+            current = memory[memory.length - 1]  // update current location in the memory
             // Delivery sensor
             for (let j=0; j < i; j++) {
                 let parcel = permutation[j]
@@ -278,12 +315,16 @@ function bruteForceFindRouteDebug(state) {
             }
         }
         results.push({permutation, memory})
+        // Debug
+        // if (util.isDeepStrictEqual(permutation, sample1Permutation)) console.log(permutation)
+        // console.log(permutation)
     }
 
     // Generate memories
     let memories = []
     for (let obj of results) memories.push(obj.memory)
 
+    /*
     console.log(results.filter(obj => util.isDeepStrictEqual(obj.permutation, [
         { place: 'Shop', address: "Farm" },
         { place: "Daria's House", address: 'Town Hall' },
@@ -291,6 +332,7 @@ function bruteForceFindRouteDebug(state) {
         { place: "Post Office", address: "Bob's House" },
         { place: "Bob's House", address: 'Cabin' }
     ]))[0])
+    */
 
     // console.log(results[0])
 
@@ -301,8 +343,8 @@ function bruteForceFindRouteDebug(state) {
     return results.filter(obj => obj.memory == shortestMemory)[0]
 }
 
-console.log(bruteForceFindRouteDebug(sample1))
-// bruteForceFindRouteDebug(sample1)
+console.log(bruteForceFindRouteDebug(sample4))
+// bruteForceFindRouteDebug(sample4)
 // console.log(bruteForceFindRoute(sample2).length)
 
 // Robot
