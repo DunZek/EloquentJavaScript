@@ -4,38 +4,6 @@ import util from 'util'
 
 /* 2. Robot efficiency
     - Write a robot that finishes the delivery task faster than "goalOrientedRobot()"
-Pseudocode:
-Input: Array -> VillageState.parcels
-Graph -> [Object: null prototype] {
-  "Alice's House": [ "Bob's House", 'Cabin', 'Post Office' ],
-  "Bob's House": [ "Alice's House", 'Town Hall' ],
-  Cabin: [ "Alice's House" ],
-  'Post Office': [ "Alice's House", 'Marketplace' ],
-  'Town Hall': [ "Bob's House", "Daria's House", 'Marketplace', 'Shop' ],
-  "Daria's House": [ "Ernie's House", 'Town Hall' ],
-  "Ernie's House": [ "Daria's House", "Grete's House" ],
-  "Grete's House": [ "Ernie's House", 'Farm', 'Shop' ],
-  Farm: [ "Grete's House", 'Marketplace' ],
-  Shop: [ "Grete's House", 'Marketplace', 'Town Hall' ],
-  Marketplace: [ 'Farm', 'Post Office', 'Shop', 'Town Hall' ]
-}
-Sample -> VillageState {
-    place: "Post Office",
-    parcels: [
-        { place: "Bob's House", address: "Cabin"},
-        { place: "Daria's House", address: 'Town Hall' },
-        { place: 'Post Office', address: "Bob's House" },
-        { place: 'Post Office', address: 'Town Hall' },
-        { place: 'Shop', address: 'Farm' }
-    ]
-}
-
-Important Axioms:
-    - Robot always starts at the "Post Office" point of the graph
-    - Parcels may be placed anywhere in the graph
-    - Parcels may be addressed anywhere in the graph
-
-Output: Array -> "A list shorter than goalOrientedRobot()'s findRoute()"
 */
 
 // Sample - beat goalOrientedRobot
@@ -263,6 +231,13 @@ function bruteForceFindRouteDebug(state) {
         { place: "Daria's House", address: 'Town Hall' },
         { place: "Bob's House", address: 'Cabin' }
     ]
+    const sample3Permutation = [
+        { place: "Post Office", address: "Grete's House" },
+        { place: "Ernie's House", address: "Farm" },
+        { place: "Ernie's House", address: "Alice's House" },
+        { place: "Farm", address: "Bob's House" },
+        { place: "Marketplace", address: "Cabin" }
+    ]
     const sample4Permutation = [
         { place: "Post Office", address: "Cabin" },
         { place: "Post Office", address: "Town Hall" },
@@ -288,21 +263,23 @@ function bruteForceFindRouteDebug(state) {
                 else if (current == parcel.place && !(carried.some(obj => util.isDeepStrictEqual(obj, parcel)))) carried.push(parcel)
             }
             let parcel = permutation[i]
-            // if (util.isDeepStrictEqual(permutation, sample4Permutation)) console.log('current parcel', parcel, ':')
+            if (util.isDeepStrictEqual(permutation, sample3Permutation)) console.log('current parcel', parcel, ':')
             // Skip parcel if already delivered
             if (delivered.includes(parcel)) continue
-            // 
-            if (current == parcel.place || carried.some(obj => util.isDeepStrictEqual(obj, parcel)) {
+            //
+            if ((current == parcel.place || carried.some(obj => util.isDeepStrictEqual(obj, parcel))) && current != parcel.address) {
+                // console.log(memory, current, parcel.address, parcel)
+                // if (util.isDeepStrictEqual(permutation, sample1Permutation)) console.log('from current, to address', memory)
                 // From current, go to address
                 memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
-                // if (util.isDeepStrictEqual(permutation, sample4Permutation)) console.log('from current, to address', memory)
             }
             // Otherwise, if both starting or last traveresed isn't current parcel's location, and current location isn
             else if (memory.length == 0 || current != parcel.place) {
+                // console.log(memory, current, parcel.address, parcel, "from current to ")
                 // From current, go to parcel
                 memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.place)).slice(1))
                 // From current, go to address
-                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
+                memory.push(...getShortestRoute(getBestPossibleRoutes(parcel.place, parcel.address)).slice(1))
                 // if (util.isDeepStrictEqual(permutation, sample4Permutation)) console.log('from current, to parcel, to address', memory)
             }
             current = memory[memory.length - 1]  // update current location in the memory
@@ -343,7 +320,7 @@ function bruteForceFindRouteDebug(state) {
     return results.filter(obj => obj.memory == shortestMemory)[0]
 }
 
-console.log(bruteForceFindRouteDebug(sample4))
+console.log(bruteForceFindRouteDebug(sample3))
 // bruteForceFindRouteDebug(sample4)
 // console.log(bruteForceFindRoute(sample2).length)
 
