@@ -254,19 +254,22 @@ function bruteForceFindRouteDebug(state) {
         // -> Generate the shortest route for each memory
         let current = state.place
         for (let i=0; i < permutation.length; i++) {
-            // Carried sensor
-            for (let i=0; i < permutation.length; i++) {
-                let parcel = permutation[i]
-                // remove from carried if already delivered
-                if (delivered.some(obj => util.isDeepStrictEqual(obj, parcel))) carried.pop(parcel)
-                // add to carried if "picked up" and not already added
-                else if (current == parcel.place && !(carried.some(obj => util.isDeepStrictEqual(obj, parcel)))) carried.push(parcel)
+            // Simulate carrying parcel
+            for (let point of memory) {
+                for (let parcel of permutation) {
+                    if (parcel.place == point && !(carried.some(obj => util.isDeepStrictEqual(obj, parcel)))) carried.push(parcel)
+                }
             }
+            // Remove parcels if delivered
+            for (let parcel of carried) {
+                if (delivered.some(obj => util.isDeepStrictEqual(obj, parcel))) carried.pop(parcel)
+            }
+            /* Generate memory */
             let parcel = permutation[i]
             if (util.isDeepStrictEqual(permutation, sample3Permutation)) console.log('current parcel', parcel, ':')
-            // Skip parcel if already delivered
+            // skip parcel if already delivered
             if (delivered.includes(parcel)) continue
-            //
+            // Go to the chosen parcel's address from where the robot is if 
             if ((current == parcel.place || carried.some(obj => util.isDeepStrictEqual(obj, parcel))) && current != parcel.address) {
                 // console.log(memory, current, parcel.address, parcel)
                 // if (util.isDeepStrictEqual(permutation, sample1Permutation)) console.log('from current, to address', memory)
