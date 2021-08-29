@@ -1,6 +1,24 @@
 'use strict';
 import {roadGraph, VillageState, runRobot, routeRobot, goalOrientedRobot} from './main.mjs'
-import util from 'util'
+// import util from 'util'
+
+class Util {
+    // Return true if objects recursively contain equal properties, else false
+    isDeepStrictEqual(obj1, obj2) {
+        // Obtain list of object keys
+        const obj1Keys = Object.keys(obj1)
+        const obj2Keys = Object.keys(obj2)
+        // Compare obj2 properties to obj1 properties, where only property existence and content are compared
+        for (let key of obj1Keys)
+        for (let i=0; i < obj1Keys.length; i++) {
+            let value1 = obj1[obj1Keys[i]]
+            if (obj2Keys.some(key => obj2[key] != value1)) return false
+        }
+        return true
+    }
+}
+
+const util = new Util()
 
 /* 2. Robot efficiency
     - Write a robot that finishes the delivery task faster than "goalOrientedRobot()"
@@ -179,27 +197,40 @@ function bruteForceFindRoute(state) {
     // #2: Generate the memory of each delivery permutation
     let memories = []
     for (let permutation of deliveryPermutations) {
-        let memory = []
-        let delivered = []  // to compensate for runtime delivery
-        // -> Generate the shortest route for each memory
         let current = state.place
+        let memory = [current]
+        // to compensate for runtime delivery
+        let delivered = []
+        let carried = []
+        // -> Generate the shortest route for each memory
         for (let i=0; i < permutation.length; i++) {
+            // Remove parcels if delivered
+            for (let parcel of carried) {
+                if (delivered.some(obj => util.isDeepStrictEqual(obj, parcel))) carried.pop(parcel)
+            }
+            // Simulate carrying parcel
+            for (let point of memory) {
+                for (let parcel of permutation) {
+                    if (parcel.place == point && !(carried.some(obj => util.isDeepStrictEqual(obj, parcel)))) carried.push(parcel)
+                }
+            }
+            /* Generate memory */
             let parcel = permutation[i]
-            // Skip parcel if already delivered
+            // skip parcel if already delivered
             if (delivered.includes(parcel)) continue
-            // Otherwise...
-            if ((memory.length == 0 || memory[memory.length - 1] != parcel.place) && current != parcel.place) {
+            // Go to the chosen parcel's address from where the robot is if
+            if ((current == parcel.place || carried.some(obj => util.isDeepStrictEqual(obj, parcel))) && current != parcel.address) {
+                // From current, go to address
+                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
+            }
+            // Otherwise, if both starting or last traveresed isn't current parcel's location, and current location isn
+            else if (memory.length == 0 || current != parcel.place) {
                 // From current, go to parcel
                 memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.place)).slice(1))
-                current = parcel.place
                 // From current, go to address
-                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
-                current = parcel.address
-            } else if (memory[memory.length - 1] == parcel.place) {
-                // From current, go to address
-                memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
-                current = parcel.address
+                memory.push(...getShortestRoute(getBestPossibleRoutes(parcel.place, parcel.address)).slice(1))
             }
+            current = memory[memory.length - 1]  // update current location in the memory
             // Delivery sensor
             for (let j=0; j < i; j++) {
                 let parcel = permutation[j]
@@ -208,7 +239,7 @@ function bruteForceFindRoute(state) {
                 }
             }
         }
-        memories.push(memory)
+        memories.push(memory.slice(1))
     }
 
     // #3: Return the shortest memory
@@ -234,8 +265,8 @@ function bruteForceFindRouteDebug(state) {
     const sample3Permutation = [
         { place: "Post Office", address: "Grete's House" },
         { place: "Ernie's House", address: "Farm" },
-        { place: "Ernie's House", address: "Alice's House" },
         { place: "Farm", address: "Bob's House" },
+        { place: "Ernie's House", address: "Alice's House" },
         { place: "Marketplace", address: "Cabin" }
     ]
     const sample4Permutation = [
@@ -247,43 +278,39 @@ function bruteForceFindRouteDebug(state) {
     ]
     let results = []
     for (let permutation of deliveryPermutations) {
-        let memory = []
+        let current = state.place
+        let memory = [current]
         // to compensate for runtime delivery
         let delivered = []
         let carried = []
         // -> Generate the shortest route for each memory
-        let current = state.place
         for (let i=0; i < permutation.length; i++) {
+            // Remove parcels if delivered
+            for (let parcel of carried) {
+                if (delivered.some(obj => util.isDeepStrictEqual(obj, parcel))) carried.pop(parcel)
+            }
             // Simulate carrying parcel
             for (let point of memory) {
                 for (let parcel of permutation) {
                     if (parcel.place == point && !(carried.some(obj => util.isDeepStrictEqual(obj, parcel)))) carried.push(parcel)
                 }
             }
-            // Remove parcels if delivered
-            for (let parcel of carried) {
-                if (delivered.some(obj => util.isDeepStrictEqual(obj, parcel))) carried.pop(parcel)
-            }
             /* Generate memory */
             let parcel = permutation[i]
-            if (util.isDeepStrictEqual(permutation, sample3Permutation)) console.log('current parcel', parcel, ':')
+            // if (util.isDeepStrictEqual(permutation, sample3Permutation)) console.log('current parcel', parcel, ':')
             // skip parcel if already delivered
             if (delivered.includes(parcel)) continue
-            // Go to the chosen parcel's address from where the robot is if 
+            // Go to the chosen parcel's address from where the robot is if
             if ((current == parcel.place || carried.some(obj => util.isDeepStrictEqual(obj, parcel))) && current != parcel.address) {
-                // console.log(memory, current, parcel.address, parcel)
-                // if (util.isDeepStrictEqual(permutation, sample1Permutation)) console.log('from current, to address', memory)
                 // From current, go to address
                 memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.address)).slice(1))
             }
             // Otherwise, if both starting or last traveresed isn't current parcel's location, and current location isn
             else if (memory.length == 0 || current != parcel.place) {
-                // console.log(memory, current, parcel.address, parcel, "from current to ")
                 // From current, go to parcel
                 memory.push(...getShortestRoute(getBestPossibleRoutes(current, parcel.place)).slice(1))
                 // From current, go to address
                 memory.push(...getShortestRoute(getBestPossibleRoutes(parcel.place, parcel.address)).slice(1))
-                // if (util.isDeepStrictEqual(permutation, sample4Permutation)) console.log('from current, to parcel, to address', memory)
             }
             current = memory[memory.length - 1]  // update current location in the memory
             // Delivery sensor
@@ -294,7 +321,7 @@ function bruteForceFindRouteDebug(state) {
                 }
             }
         }
-        results.push({permutation, memory})
+        results.push({permutation, memory: memory.slice(1)})
         // Debug
         // if (util.isDeepStrictEqual(permutation, sample1Permutation)) console.log(permutation)
         // console.log(permutation)
@@ -356,7 +383,7 @@ Permutation:
     {place: "Alice's House", address: "Ernie's House"},
     {place: "Daria's House", address: "Shop"}
 */
-// 16: [ A C A B T D T B A B T D E D T S ] - finished 2021-08-26 to 2021-08-26 (unoptimized)
+// 12: [ A C A B T D E G S M P A ] - finished 2021-08-26 to 2021-08-26 (optimized)
 // runRobot(sample2, bruteForceFindRouteRobot, [])
 
 /*
@@ -367,7 +394,7 @@ Permutation:
     {place: "", address: ""},
     {place: "", address: ""}
 */
-// 17: [ M F M T B T D E G F G E D T B A P M P A C ] - finished 2021-08-26 to 2021-08-27 (unoptimized)
+// 11: [ M F G E G F M T B A C ] - finished 2021-08-26 to 2021-08-27 (optimized)
 // runRobot(sample3, bruteForceFindRouteRobot, [])
 
 
