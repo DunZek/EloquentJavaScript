@@ -9,16 +9,67 @@ class Util {
         const obj1Keys = Object.keys(obj1)
         const obj2Keys = Object.keys(obj2)
         // Compare obj2 properties to obj1 properties, where only property existence and content are compared
-        for (let key of obj1Keys)
-        for (let i=0; i < obj1Keys.length; i++) {
-            let value1 = obj1[obj1Keys[i]]
-            if (obj2Keys.some(key => obj2[key] != value1)) return false
+        for (let key1 of obj1Keys) {
+            // Existential check
+            if (!(obj2Keys.includes(key1))) return false
+            // Content check
+            let value1 = obj1[key1]
+            for (let key2 of obj2Keys) {
+                let value2 = obj2[key2]
+                if (key1 == key2) if (value1 != value2) return false
+            }
         }
         return true
     }
 }
 
 const util = new Util()
+
+/* Unit tests */
+let obj1 = {a: 0, b: 1, c: 2}
+let obj2 = {a: 0, b: 1, c: 2}
+// Non-recursive objects & Primitive properties
+console.log('1. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj2 = {a: 0, c: 2, b: 1}
+console.log('2. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj2 = {a: 0, c: 2}
+console.log('3. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj2 = {}
+console.log('4. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj1 = {}
+obj2 = {}
+console.log('5. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// Non-recursive objects & Data structure properties
+obj1 = {a: ['x', 'y', 'z'], b: 0, c: ['spam']}
+obj2 = {a: ['x', 'y', 'z'], b: 0, c: ['spam']}
+console.log('6. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj1 = {a: ['x', 'y']}
+obj2 = {a: ['x', 'z']}
+// console.log('7. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj1 = {a: [], b: [], c: []}
+obj2 = {a: [], b: []}
+// console.log('8. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// Recursive objects & Primitive properties
+obj1 = {a: {x: 0, y: 1, z: 2}, b: {x: 0, y: 1, z: 2}, c: 'spam'}
+obj2 = {a: {x: 0, y: 1, z: 2}, b: {x: 0, y: 1, z: 2}, c: 'spam'}
+// console.log('9. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj1 = {a: {b: {c: {d: {e: 'spam'}}}}}
+obj2 = {a: {b: {c: {d: {e: 'spam'}}}}}
+// console.log('10. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj1 = {a: {b: {c: 'y'}}}
+obj2 = {a: {b: {x: 'y'}}}
+// console.log('11. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// Recursive objects & Data structure properties
+obj1 = {a: {x: ['foo', 'bar'], y: ['hello', 'world']}, b: {z: [0, 1, 2]}}
+obj2 = {a: {x: ['foo', 'bar'], y: ['hello', 'world']}, b: {z: [0, 1, 2]}}
+// console.log('12. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj1 = {a: {x: ['foo', 'bar'], y: ['hello', 'world']}, b: {z: [0, 1, 2]}}
+obj2 = {a: {x: ['bar', 'foo'], y: ['world', 'hello']}, b: {z: [2, 1, 0]}}
+// console.log('13. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+obj1 = {a: [[1, 2, 3], [4, 5, 6], [7, 8, 9], 0, []], b: [{}, {c: 'forty-two'}, {}]}
+obj2 = {a: [[1, 2, 3], [4, 5, 6], [7, 8, 9], 0, []], b: [{}, {c: 'forty-two'}, {}]}
+// console.log('14. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+
 
 /* 2. Robot efficiency
     - Write a robot that finishes the delivery task faster than "goalOrientedRobot()"
@@ -350,7 +401,7 @@ function bruteForceFindRouteDebug(state) {
     return results.filter(obj => obj.memory == shortestMemory)[0]
 }
 
-console.log(bruteForceFindRouteDebug(sample3))
+// console.log(bruteForceFindRouteDebug(sample3))
 // bruteForceFindRouteDebug(sample4)
 // console.log(bruteForceFindRoute(sample2).length)
 
