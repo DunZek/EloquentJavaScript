@@ -87,7 +87,9 @@ function runRobot(state, robot, memory){  // VillageState, predicate-function, m
     for (let turnCount = 0;; turnCount++){
         if (state.parcels.length == 0){
             console.log(`Done in ${turnCount} turns`)
-            break  // end simulation: there are no more parcels to deliver
+            // break  // end simulation: there are no more parcels to deliver
+            // For debugging:
+            return turnCount
         }
         let action = robot(state, memory)  // robot() is actually a predicate function which makes a decision and returns an action
         state = state.move(action.direction)
