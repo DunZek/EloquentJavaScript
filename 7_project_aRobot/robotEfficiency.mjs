@@ -1,25 +1,71 @@
 'use strict';
 import {roadGraph, VillageState, runRobot, routeRobot, goalOrientedRobot} from './main.mjs'
+import colors from 'colors'
 // import util from 'util'
 
+// finished 2021-08-29:
+// Class - utilty class - mimicks "util" node.js module, and the isDeepStrictEqual() method to be specific using native self-written code
 class Util {
     // Return true if objects recursively contain equal properties, else false
     isDeepStrictEqual(obj1, obj2) {
-        // Obtain list of object keys
-        const obj1Keys = Object.keys(obj1)
-        const obj2Keys = Object.keys(obj2)
-        // Compare obj2 properties to obj1 properties, where only property existence and content are compared
-        for (let key1 of obj1Keys) {
-            // Existential check
-            if (!(obj2Keys.includes(key1))) return false
-            // Content check
-            let value1 = obj1[key1]
-            for (let key2 of obj2Keys) {
-                let value2 = obj2[key2]
-                if (key1 == key2) if (value1 != value2) return false
+        // Recursive functionality
+        function recurse(obj1, obj2) {
+            // Obtain list of object keys
+            const obj1Keys = Object.keys(obj1)
+            const obj2Keys = Object.keys(obj2)
+            // Compare obj2 properties to obj1 properties, where only property existence and content are compared
+            for (let key1 of obj1Keys) {
+                // Existential check
+                if (!(obj2Keys.includes(key1))) return {value: false, check: "Existential check", obj1, obj2}
+                // Content check
+                let value1 = obj1[key1]
+                for (let key2 of obj2Keys) {
+                    let value2 = obj2[key2]
+                    // Content comparison
+                    if (key1 == key2) {
+                        // Data structure properties
+                        if (typeof value1 == "object" && typeof value2 == "object") {
+                            // Array-Object check
+                            if (typeof value1.length == 'number' && typeof value2.length != 'number') return {value: false, check: "Array-Object check", value1, value2}
+                            // Arrays
+                            if (typeof value1.length == 'number' && typeof value2.length == 'number') {
+                                for (let i=0; i < value1.length && i < value2.length; i++) {
+                                    let item1 = value1[i]
+                                    let item2 = value2[i]
+                                    // Recursive arrays
+                                    if (typeof item1 == "object" && typeof item2 == "object") {
+                                        // Array-Object check
+                                        if (typeof item1.length == 'number' && typeof item2.length != 'number') return {value: false, check: "Recursive arrays: Array-Object check", item1, item2}
+                                        // Arrays
+                                        if (typeof item1.length == 'number' && typeof item2.length == 'number') {
+                                            for (let k=0; k < item1.length && k < item2.length; k++) {
+                                                let subitem1 = item1[k]
+                                                let subitem2 = item2[k]
+                                                if (!(recurse(subitem1, subitem2).value)) return {value: false, check: "Recursive arrays: Arrays", subitem1, subitem2}
+                                            }
+                                        }
+                                        // Non-Array
+                                        else return {value: recurse(item1, item2).value, check: "Recursive arrays: Non-Array", item1, item2}
+                                    }
+                                    // Primitive arrays
+                                    else if (item1 != item2) return {value: false, check: "Primitive Arrays", item1, item2}
+                                }
+                            }
+                            // Objects
+                            else return {value: recurse(value1, value2).value, check: "Objects", value1, value2}
+                        }
+                        // Primitive properties
+                        if (value1 != value2 && (typeof value1 != "object" || typeof value2 != "object")) return {value: false, check: "Primitive properties", value1, value2}
+                    }
+                }
             }
+            // True
+            return {value: true, check: "True", obj1, obj2}
         }
-        return true
+        // For debugging:
+        // return recurse(obj1, obj2)
+        // Otherwise:
+        return recurse(obj1, obj2).value
     }
 }
 
@@ -29,46 +75,52 @@ const util = new Util()
 let obj1 = {a: 0, b: 1, c: 2}
 let obj2 = {a: 0, b: 1, c: 2}
 // Non-recursive objects & Primitive properties
-console.log('1. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`1. Assert? must be ${"true".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj2 = {a: 0, c: 2, b: 1}
-console.log('2. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`2. Assert? must be ${"true".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj2 = {a: 0, c: 2}
-console.log('3. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`3. Assert? must be ${"false".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj2 = {}
-console.log('4. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`4. Assert? must be ${"false".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj1 = {}
 obj2 = {}
-console.log('5. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`5. Assert? must be ${"true".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 // Non-recursive objects & Data structure properties
 obj1 = {a: ['x', 'y', 'z'], b: 0, c: ['spam']}
 obj2 = {a: ['x', 'y', 'z'], b: 0, c: ['spam']}
-console.log('6. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`6. Assert? must be ${"true".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj1 = {a: ['x', 'y']}
 obj2 = {a: ['x', 'z']}
-// console.log('7. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`7. Assert? must be ${"false".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj1 = {a: [], b: [], c: []}
 obj2 = {a: [], b: []}
-// console.log('8. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`8. Assert? must be ${"false".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 // Recursive objects & Primitive properties
 obj1 = {a: {x: 0, y: 1, z: 2}, b: {x: 0, y: 1, z: 2}, c: 'spam'}
 obj2 = {a: {x: 0, y: 1, z: 2}, b: {x: 0, y: 1, z: 2}, c: 'spam'}
-// console.log('9. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`9. Assert? must be ${"true".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj1 = {a: {b: {c: {d: {e: 'spam'}}}}}
 obj2 = {a: {b: {c: {d: {e: 'spam'}}}}}
-// console.log('10. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`10. Assert? must be ${"true".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj1 = {a: {b: {c: 'y'}}}
 obj2 = {a: {b: {x: 'y'}}}
-// console.log('11. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`11. Assert? must be ${"false".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 // Recursive objects & Data structure properties
 obj1 = {a: {x: ['foo', 'bar'], y: ['hello', 'world']}, b: {z: [0, 1, 2]}}
 obj2 = {a: {x: ['foo', 'bar'], y: ['hello', 'world']}, b: {z: [0, 1, 2]}}
-// console.log('12. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`12. Assert? must be ${"true".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj1 = {a: {x: ['foo', 'bar'], y: ['hello', 'world']}, b: {z: [0, 1, 2]}}
 obj2 = {a: {x: ['bar', 'foo'], y: ['world', 'hello']}, b: {z: [2, 1, 0]}}
-// console.log('13. Assert? must be "false" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`13. Assert? must be ${"false".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2))  // ^^
 obj1 = {a: [[1, 2, 3], [4, 5, 6], [7, 8, 9], 0, []], b: [{}, {c: 'forty-two'}, {}]}
 obj2 = {a: [[1, 2, 3], [4, 5, 6], [7, 8, 9], 0, []], b: [{}, {c: 'forty-two'}, {}]}
-// console.log('14. Assert? must be "true" and returns:', util.isDeepStrictEqual(obj1, obj2))
+// console.log(`14. Assert? must be ${"true".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2, '#14'))  // ^^
+obj1 = {a: [[1, [2, [3]], [4, [5]]], [6, [7, [8]], [9, [10]]], [11, [12, [13]], [14, [15]]]]}
+obj2 = {a: [[1, [2, [3]], [4, [5]]], [6, [7, [8]], [9, [10]]], [11, [12, [13]], [14, [15]]]]}
+// console.log(`15. Assert? must be ${"true".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2, '#15'))  // ^^
+obj1 = {a: [[1, [2, [3]], [4, [5]]], [6, [7, [8]], [9, [10]]], [11, [12, [13]], [14, [15]]]]}
+obj2 = {a: [[1, [2, [3]], [4, [5]]], [6, [7, [8]], [9, [101]]], [11, [12, [13]], [14, [15]]]]}
+// console.log(`16. Assert? must be ${"false".yellow} and returns:`, util.isDeepStrictEqual(obj1, obj2, '#16'))  // ^^
 
 
 /* 2. Robot efficiency
@@ -239,7 +291,7 @@ function getShortestRoute(routes) {
 }
 
 
-// Main algorithm
+// finished 2021-08-29 (with ~90% accurate best routes taken to solve delivery task): Main algorithm
 function bruteForceFindRoute(state) {
 
     // #1: Generate every permutation of delivery
@@ -401,11 +453,8 @@ function bruteForceFindRouteDebug(state) {
     return results.filter(obj => obj.memory == shortestMemory)[0]
 }
 
-// console.log(bruteForceFindRouteDebug(sample3))
-// bruteForceFindRouteDebug(sample4)
-// console.log(bruteForceFindRoute(sample2).length)
 
-// Robot
+// finished 2021-08-29 (with ~90% accurate best routes taken to solve delivery task): Robot
 function bruteForceFindRouteRobot(state, memory){
     // generate a route if none already given and if there are still parcels
     if (memory.length == 0) memory = bruteForceFindRoute(JSON.parse(JSON.stringify(state)))
@@ -453,6 +502,16 @@ Permutation:
 // runRobot(sample, routeRobot, route)
 // runRobot(sample, goalOrientedRobot, [])
 
+/* Average calculator */
+let tests = 100
+let turnCounts = []
+for (let i=1; i <= tests; i++) {
+    let turnCount = runRobot(VillageState.random(), bruteForceFindRouteRobot, [])
+    turnCounts.push(turnCount)
+    console.log(`Test #${i} complete at ${turnCount} turns`)
+}
+console.log('Using numbers:', turnCounts)
+console.log('Average calculated:', turnCounts.reduce((sum, num) => sum + num) / turnCounts.length)
 
-// ... lines used, thus at most ... lines of code.
+// ~500 lines used, thus at most ~500 lines of code.
 export {bruteForceFindRouteRobot}
