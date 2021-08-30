@@ -86,7 +86,7 @@ let object = Object.freeze({value: 5})
 function runRobot(state, robot, memory){  // VillageState, predicate-function, memory
     for (let turnCount = 0;; turnCount++){
         if (state.parcels.length == 0){
-            console.log(`Done in ${turnCount} turns`)
+            // console.log(`Done in ${turnCount} turns`)
             // break  // end simulation: there are no more parcels to deliver
             // For debugging:
             return turnCount
@@ -94,7 +94,7 @@ function runRobot(state, robot, memory){  // VillageState, predicate-function, m
         let action = robot(state, memory)  // robot() is actually a predicate function which makes a decision and returns an action
         state = state.move(action.direction)
         memory = action.memory
-        console.log(`Moved to ${action.direction}`)
+        // console.log(`Moved to ${action.direction}`)
         // console.log(state)
     }
 }
