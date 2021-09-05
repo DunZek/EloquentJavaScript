@@ -2,7 +2,8 @@
 
 // Dependencies
 import {VillageState, routeRobot, goalOrientedRobot, runRobot} from './main.mjs'
-import {bruteForceFindRouteRobot} from './robotEfficiency.mjs'
+import {bruteForceFindRouteRobot, Util} from './robotEfficiency.mjs'
+
 
 /* 1. Measuring a robot
     - Write a compareRobots():
@@ -59,7 +60,7 @@ function myRunRobot(state, robot, memory){
 }
 
 // console.log(compareRobots([routeRobot, goalOrientedRobot], [[], []]))
-console.log('goalOrientedRobot & bruteForceFindRouteRobot', compareRobots([goalOrientedRobot, bruteForceFindRouteRobot], [[], []]))
+// console.log('goalOrientedRobot & bruteForceFindRouteRobot', compareRobots([goalOrientedRobot, bruteForceFindRouteRobot], [[], []]))
 
 /* 2. Robot efficiency
     - Write a robot that finishes the delivery task faster than "goalOrientedRobot()"
@@ -99,4 +100,50 @@ Output: Array -> "A list shorter than goalOrientedRobot()'s findRoute()"
 
 // runRobot(sampleVillage, yourRobot, memory)
 
-/* 3. Persistent group */
+/* 3. Persistent group
+    - Sets
+    - Write PGroup, like Group, which stores a set of values
+        - return new PGroups: add, delete,
+        - has
+    - "constructor shouldn't be part of the class' interface"
+        - but use it internally
+    - Use empty instance (PGroup.empty) as starting value
+    - why need only one PGroup.empty value rather than using a function that creates a new empty map everytime?
+
+*/
+const util = new Util()
+
+class PGroup {
+    constructor(items) {
+        this.items = items.filter(item => util.isDeepStrictEqual())
+
+        function settify(iterable) {
+            [1, 2, 2, 3]
+            return iterable.
+        }
+    }
+    // Methods
+    add(...items) {
+        let set = this.items
+
+        return new PGroup(set)
+    }
+    delete(...items) {
+        let array = [...this.items]
+        for (let newItems of ...items) {
+            array.filter(oldItems => oldItems != newItems)
+        }
+
+        return new PGroup(this.items.filter(old => ))
+    }
+}
+
+// let a = PGroup.empty.add("a")
+// let ab = a.add("b")
+// let b = ab.delete("a")
+//
+// console.log(b.has())
+
+let myPG = new PGroup([1, 2, 3])
+
+console.log(myPG)
