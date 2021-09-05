@@ -1,5 +1,5 @@
 /*
-    Numbers
+    Numbers 
     - 64 bits (2^64) can be used to represent a number (signed integer, float).
     - Actual maximum whole number to be represented is around 9 quadrillion
 */
@@ -9,7 +9,7 @@ positive_infinity = Infinity  // the converted value of a positive number that i
 negative_infinity = -Infinity  // for negative numbers that are too big
 console.log(0 == NaN == Infinity - Infinity)  // NaN's are used to denote the value of nonsensical operations
 
-/* 
+/*
     Strings
     - 16 bits (2^16) can be used to represent a string. It is the maximum size.
     - There are over 2^16 possible unicode characters.
