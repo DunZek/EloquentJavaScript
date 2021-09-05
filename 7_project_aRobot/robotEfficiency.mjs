@@ -505,11 +505,11 @@ Permutation:
 /* Average calculator */
 let tests = 100
 let turnCounts = []
-for (let i=1; i <= tests; i++) {
-    let turnCount = runRobot(VillageState.random(), bruteForceFindRouteRobot, [])
-    turnCounts.push(turnCount)
-    console.log(`Test #${i} complete at ${turnCount} turns`)
-}
+// for (let i=1; i <= tests; i++) {
+//     let turnCount = runRobot(VillageState.random(), bruteForceFindRouteRobot, [])
+//     turnCounts.push(turnCount)
+//     console.log(`Test #${i} complete at ${turnCount} turns`)
+// }
 // console.log('Using numbers:', turnCounts)
 // console.log('Average calculated:', turnCounts.reduce((sum, num) => sum + num) / turnCounts.length)
 
