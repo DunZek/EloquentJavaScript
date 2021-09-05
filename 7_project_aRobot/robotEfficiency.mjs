@@ -514,4 +514,4 @@ console.log('Using numbers:', turnCounts)
 console.log('Average calculated:', turnCounts.reduce((sum, num) => sum + num) / turnCounts.length)
 
 // ~500 lines used, thus at most ~500 lines of code.
-export {bruteForceFindRouteRobot}
+export {bruteForceFindRouteRobot, Util}
