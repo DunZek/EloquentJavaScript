@@ -10,4 +10,4 @@ let sample = new VillageState(
         { place: 'Shop', address: 'Farm' }
     ]
 )
-runRobot(sample, goalOrientedRobot, []);
+// runRobot(sample, goalOrientedRobot, []);
