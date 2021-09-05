@@ -115,12 +115,7 @@ const util = new Util()
 
 class PGroup {
     constructor(items) {
-        this.items = items.filter(item => util.isDeepStrictEqual())
-
-        function settify(iterable) {
-            [1, 2, 2, 3]
-            return iterable.
-        }
+        this.items = items
     }
     // Methods
     add(...items) {
