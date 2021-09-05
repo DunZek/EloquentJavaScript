@@ -15,3 +15,6 @@ To return to:
 7. Project: A Robot
 9. Regular Expressions (exercises)
 10. Modules
+
+Note:
+- Redo, restructure, Chapter 1 to 12 (Part 1: Language) before proceeding to web development afterwards
