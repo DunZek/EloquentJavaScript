@@ -510,8 +510,8 @@ for (let i=1; i <= tests; i++) {
     turnCounts.push(turnCount)
     console.log(`Test #${i} complete at ${turnCount} turns`)
 }
-console.log('Using numbers:', turnCounts)
-console.log('Average calculated:', turnCounts.reduce((sum, num) => sum + num) / turnCounts.length)
+// console.log('Using numbers:', turnCounts)
+// console.log('Average calculated:', turnCounts.reduce((sum, num) => sum + num) / turnCounts.length)
 
 // ~500 lines used, thus at most ~500 lines of code.
 export {bruteForceFindRouteRobot, Util}
