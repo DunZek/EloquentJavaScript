@@ -1,4 +1,6 @@
 # Chapter 1: Values, Types, and Operators
+> Introduction to JavaScript and programming by exploring ground-level basic understanding
+
 - ###### Numbers *- implementations*
     - represented using bits (x32, x64).
     - maximum value depends on bit architecture.
