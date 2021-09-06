@@ -1,0 +1,58 @@
+# 1. Values, Types, and Operators
+- ###### Numbers *- implementations*
+    - represented using bits (x32, x64).
+    - maximum value depends on bit architecture.
+    - `9.81` - fractional numbers
+    - `2.998e8  // 2.998 x 10^8` - scientific notation
+- ###### Special numbers *- special numbers in JavaScript:*
+    - `Infinity` - for representing positive numerical overflows
+    - `-Infinity` - for representing negative numerical overflows
+    - `NaN`- for representing nonsensical results
+- ###### Strings *- implementations*
+    - The maximum bit size for representing strings is 16
+    - So there are 2^16 possible combinations of Unicode characters
+    - `"Lie on " + 'the ocean floor'` - either may be used
+    - ```string = `Hello World` ``` - back-ticks actually register newlines
+- ###### Unary operators *- some examples*
+    - `-50` - negative sign
+    - `!(true == true)  // false` - negator
+    - `typeof 30  // number` - keywords
+- ###### Comparison
+    - `"apple" > "Archimedes"  // true` - ordinal Unicode positions of characters are compared
+    - `"AbC" > "ABC"  // true` - because `b` comes before `B`
+    - `NaN == NaN  // false` - because `NaN` denotes nonsensical computation and so doesn't equate to anything else
+- ###### Logical operators
+    - `console.log(1 + 1 == 2 && 10 * 10 > 50)` - which operators are evaluated first?
+    - `+, &, /` - first, numerical operations
+    - `>=, ==` - second, comparison operations
+    - `AND` - third, `AND` logical operator
+    - `OR` - last, `OR` logical operator
+- ###### Ternary operators
+    - Returns first value if true else second value.
+    - `true ? 1 : 2  // 1`
+    - `false ? 1 : 2  // 2`
+- ###### Empty values
+    - Denote the absence of meaningful results.
+    - Can be used as return placeholders.
+    - `null == undefined  // true`
+- ###### Automatic type conversion
+    - To avoid automatic type conversion during comparison operations, use `===` ("identical to") operator:
+        - `false === 0  // false`
+    - Otherwise, the JavaScript language's possesses an intentional feature to convert types when executing operations.
+    - `8 * null  // 0` - `null` type-converts to 0 upon mathematical operations
+    - `"5" - 1  // 4` - stringified numbers type-convert to numbers
+    - `"5" + 1  // 51` - unless the operation is addition, which causes numbers to concatenate unto strings
+    - `"five" * 2  // NaN`
+    - `false == 0  // true` - booleans type convert to numbers upon operations
+
+- ###### Short-circuiting of logical operators
+    - Used to control the evaluation of type-converting logical operations. The type conversion of logical operators is as defined as below.
+    - `0`, `NaN`, `""` count as false, while everything else counts as true
+    - Using the `||` "OR" operator:
+        - `null || "user"  // "user"` - returns left value if it *can* be type-converted to `true`, otherwise the right value
+        - `"Agnes" || "user"  // Agnes`
+        - `0 || -1  // -1`
+    - Using the `&&` "AND" operator:
+        - `null && "user"  // null` - returns left value if it *can't* be type-converted to `true`, otherwise the right value
+    - Note that the expression to the right of these short-circuiting operators evaluate only if necessary: when the left-side value does not meet the requirement of the operator.
+    - Thus, right-side expressions do *not* evaluate if the left-side expressions can be.
