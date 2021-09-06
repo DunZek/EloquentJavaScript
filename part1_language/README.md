@@ -8,7 +8,7 @@
         - *Operators* - individual functions that operate upon values
     - The understanding establishes further craft and exploration into the language.
 2. ###### Program Structure
-- ...
+- Constructing basic programs from the suite of expressions explored last chapter.
 3. ###### Functions
 4. ###### Data Structures: Objects and Arrays
 5. ###### Higher-Order Functions
