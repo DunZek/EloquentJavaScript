@@ -1,7 +1,15 @@
 # Part 1: Language
 ---
-1. Values, Types, and Operators
-2. Program Structure
+##### 1. Values, Types, and Operators
+- Numbers - adsfasdf
+- Special numbers -
+- Strings
+- Unary operators
+- Comparison
+- Logical operators
+- Empty values -
+
+##### 2. Program Structure
 3. Functions
 4. Data Structures: Objects and Arrays
 5. Higher-Order Functions
