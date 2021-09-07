@@ -17,8 +17,8 @@
 
 ---
 ### *JavaScript features*
-###### 8. Bugs and Errors
-###### 9. Regular Expressions
-###### 10. Modules
-###### 11. Asynchronous Programming
-###### 12. Project: A Programming Language
+8. ###### Bugs and Errors
+9. ###### Regular Expressions
+10. ###### Modules
+11. ###### Asynchronous Programming
+12. ###### Project: A Programming Language
