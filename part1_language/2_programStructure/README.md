@@ -73,5 +73,45 @@
 ---
 ### Exercises
 - ###### Looping A Triangle
+    - ```javascript
+    // Expected output:
+    // #
+    // ##
+    // ###
+    // ####
+    // #####
+    // ######
+    // #######
+    // Use a for loop to simultaneously use and reuse a binding and to print it.
+    for (let octothorp = "#"; octothorp.length <= 7; octothorp += "#") console.log(octothorp)
+    ```
 - ###### FizzBuzz
+    - ```javascript
+    // Use an empty string to output the result for each turn
+    // Use FizzBuzz control flow to decide result
+    for (let i = 1; i <= 100; i++) {
+        output = ""
+        if (i % 3 == 0) output += "Fizz"
+        if (i % 5 == 0) output += "Buzz"
+        console.log(`${i}: ${output}`)
+    }
+    ```
 - ###### Chessboard
+    - ```javascript
+    // Use an empty string to print as the board
+    // Use a for loop to write to that string
+    // Nest that for loop in another for loop to control flow and build the board
+    let size = 9
+    let board = ""
+    for (let y = 1; y <= size; y++) {
+        for (let x = 1; x <= size; x++) {
+            if ((x + y) % 2 == 0) {
+                board += " "
+            } else {
+                board += "#"
+            }
+        }
+        board += "\n"
+    }
+    console.log(board)
+    ```
