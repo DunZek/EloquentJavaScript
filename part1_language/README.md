@@ -8,7 +8,8 @@
         - *Operators* - individual functions that operate upon values
     - The understanding establishes further craft and exploration into the language.
 2. ###### Program Structure
-- Constructing basic programs from the suite of expressions explored last chapter.
+    - Constructing basic programs from the suite of expressions explored last chapter.
+    - And so we construct programs, but only so after we have understood their compositional elements. The construction of programs involve the piecing of statements and expressions of varying functionalities together. The control flow of the program is concerned in the manner of intent. Multiple tools are used to accomplish different ways of controlling flow.
 3. ###### Functions
 4. ###### Data Structures: Objects and Arrays
 5. ###### Higher-Order Functions
