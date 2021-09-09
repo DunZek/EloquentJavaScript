@@ -49,10 +49,47 @@
     - Programmers must act on a balance between speed and elegance, as almost any program can be made faster just by making it bigger and more convoluted, as the programmer increasingly becomes explicit in their programming (all the way down to machine code).
     - First and foremost, write to completion via understanding, then optimize later. Do not be afraid to forego efficiency when starting out on tackling ambitious ideas.
 - ###### Growing Functions
+    - Computer programs can be written in an infinite number of ways to achieve a particular task.
+    - When writing programs, consider sophistication only when paramount. Such programs would else be a waste of time to write.
+    - Consider more so the versatility of the individual components of your program, or the versatility of the program itself. This enables ease of use for other programmers and thus in the end, users.
 - ###### Functions and Side Effects
+    - Functions are used for either returning values or for executing side effects, or both actually. The former by nature are more versatile things, such are called *pure functions*. The latter enables human interaction.
+    - Pure functions neither have side effects nor utilize side effects. Pure function work in a manner in such that the same arguments passed in, the same data and information used will result in the same results indefinitely.
+
 
 ---
 ### Exercises
 - ###### Minimum
+    - ```javascript
+    // Use a ternary operator, use syntactic sugar to return the minimum argument passed in
+    const min = (numA, numB) => numA >= numB ? numB : numA
+    ```
 - ###### Recursion
+    - ```javascript
+    // Work with mathematics and recursion to subtract by two and determine whether the number is even or odd
+    function isEven(num) {
+        if (num == 1) return false
+        else if (num == 0) return true
+        else if (num < 0) return isEven(-num)
+        else return isEven(num - 2)
+    }
+    ```
 - ###### Bean counting
+    - ```javascript
+    // Demonstrating program versatility
+
+    // First program - strict usage
+    let countBs = string => {
+        count = 0
+        for (let i=0; i <= string.length; i++) if (string[i] == "B") count += 1
+        return count
+    }
+
+    // Second program - versatile implementation
+    function countChar(string, char) {
+        count = 0
+        for (let i=0; i < string.length; i++) if (string[i] == char) count += 1
+        return count
+    }
+    let countBs = string => countchar(string, "B")
+    ```
