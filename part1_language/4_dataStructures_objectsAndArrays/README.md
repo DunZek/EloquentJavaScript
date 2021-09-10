@@ -4,7 +4,9 @@
 ### Notes
 - Data structures are importantly composed of primitives and objects. The latter enables the aggregation of values and thus the construction of complex structures.
 - ###### The Weresquirrel
+    - Valuable information can be stored and utilized in the computer as a data structure.
 - ###### Data sets
+    -
 - ###### Properties
 - ###### Methods
 - ###### Objects
