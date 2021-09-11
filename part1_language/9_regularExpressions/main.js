@@ -55,8 +55,8 @@ let myRegEx = /[\d.]/  // periods and other special characters such as "+" and "
 
 // Example - inverting a set of characters
 let notBinary = /[^01]/  // the caret "^" character asserts the expression to match any pattern except the set within the brackets
-console.log(notBinary.test("1101100011"))  // true
-console.log(notBinary.test("1101102011"))  // false
+console.log(notBinary.test("1101100011"))  // false
+console.log(notBinary.test("1101102011"))  // true
 
 /* Repeating Parts Of A Pattern
     - Putting a plus sign "+" after a pattern in a regular expression indicates that an element may be repeated more than once
