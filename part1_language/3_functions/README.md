@@ -61,35 +61,35 @@
 ### Exercises
 - ###### Minimum
     - ```javascript
-    // Use a ternary operator, use syntactic sugar to return the minimum argument passed in
-    const min = (numA, numB) => numA >= numB ? numB : numA
-    ```
+      // Use a ternary operator, use syntactic sugar to return the minimum argument passed in
+      const min = (numA, numB) => numA >= numB ? numB : numA
+      ```
 - ###### Recursion
     - ```javascript
-    // Work with mathematics and recursion to subtract by two and determine whether the number is even or odd
-    function isEven(num) {
-        if (num == 1) return false
-        else if (num == 0) return true
-        else if (num < 0) return isEven(-num)
-        else return isEven(num - 2)
-    }
-    ```
+      // Work with mathematics and recursion to subtract by two and determine whether the number is even or odd
+      function isEven(num) {
+          if (num == 1) return false
+          else if (num == 0) return true
+          else if (num < 0) return isEven(-num)
+          else return isEven(num - 2)
+      }
+      ```
 - ###### Bean counting
     - ```javascript
-    // Demonstrating program versatility
+      // Demonstrating program versatility
 
-    // First program - strict usage
-    let countBs = string => {
-        count = 0
-        for (let i=0; i <= string.length; i++) if (string[i] == "B") count += 1
-        return count
-    }
+      // First program - strict usage
+      let countBs = string => {
+          count = 0
+          for (let i=0; i <= string.length; i++) if (string[i] == "B") count += 1
+          return count
+      }
 
-    // Second program - versatile implementation
-    function countChar(string, char) {
-        count = 0
-        for (let i=0; i < string.length; i++) if (string[i] == char) count += 1
-        return count
-    }
-    let countBs = string => countchar(string, "B")
-    ```
+      // Second program - versatile implementation
+      function countChar(string, char) {
+          count = 0
+          for (let i=0; i < string.length; i++) if (string[i] == char) count += 1
+          return count
+      }
+      let countBs = string => countchar(string, "B")
+      ```
