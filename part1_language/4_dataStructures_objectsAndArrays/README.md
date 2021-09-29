@@ -92,10 +92,48 @@
           bar = 'abc'  // Uncaught TypeError: Assignment to constant variable
           ```
 - ###### The Lycanthrope's Log
+    - correlation -> measure of dependence between statistical variables.
+        - Usually expressed as a value that ranges from -1 to 1
+            - `-1` - definitely NOT correlated
+            - `0` - no correlation
+            - `1` - definitely correlated
+    - measurements -> sets of statistical variables
+    - "phi (ϕ) coefficient" -> calculated by a formula for measuring correlation between two Boolean variables
+        - Input -> a frequency table of different variable combinations
+        - Output -> a number between -1 and 1 (phi "ϕ" itself)
 - ###### Computing Correlation
+    - Neither squirrel nor pizza (00): 76
+    - Pizza (01): 9
+    - Squirrel (10): 4
+    - squirrel AND pizza (11): 1
+
+    - All of squirrel (1*): 5
+    - None of squirrel (0*): 85
+    - All of pizza (*1): 10
+    - None of pizza (*0): 80
+
+    - `ϕ` = `( (11)x(00) - (10)x(01) )/sqrt( (1*)x(0*)x(*1)x(*0) )`
 - ###### Array Loops
+    - Accessing array elements is common practice:
+        - ```js
+          for (let i = 0; i < array.length; i++) {
+              let element = array[i]
+              console.log(element)
+          }
+          ```
+    - And so the syntax has been simplified in ES6:
+        - ```js
+          for (let element of array){
+              console.log(element)
+          }
+          ```
 - ###### The Final Analysis
+    - Log every event into a list
+    - Calculate and show the correlation between 'squirrel' and a given event
+    - Filter to show only results with correlations greater than 0.1 or less than -0.1
+    - Modify event to push the "peanut teeth" even when Jacques does not brush his teeth and also ate peanuts
 - ###### Further Arrayology
+    -
 - ###### Strings and their Properties
 - ###### Rest Parameters
 - ###### The Math Object
