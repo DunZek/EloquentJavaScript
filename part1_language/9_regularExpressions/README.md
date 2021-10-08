@@ -254,18 +254,265 @@
           regex.exec("0101b 306")  // backtracks from decimal to binary
           // Switched binary and decimal places
           regex = /\b(\d+|[\da-f]+h|[01]+b)\b/
-          regex.exec("0101b 306") //
+          regex.exec("0101b 306") // back tracks from decimal to binary
+          ```
+    - Backtracking caused by repetition operators:
+        - ```js
+          /^.*x/.exec("abcxe")  // backtracking occurs until "abc" is found where an "x" occurs after "abc"
+          // ^^ The final positions where the match is found then occurs from index 0 to index 4
+          ```
+    - Accidental backtracking
+        - ```js
+          // a binary - number regular expression that improperly uses repetition operators
+          /([01]+)+b/.exec("10010100010010011001101010101b")  // here, double the work is done than otherwise
           ```
 - ###### The Replace Method
-    -
+    - Strings possess a `replace()` method used for replacing parts of a string with other strings
+    - Replacing the first character instance with a different character
+        - ```js
+          "papa".replace('p', "m")  // mapa
+          ```
+    - Using regular expressions
+        - ```js
+          // Only the first instance
+          "Borobudur".replace(/[ou]/, "a")  // Barobudur
+          ```
+        - ```js
+          // Every instance specified with 'g' suffix
+          "Borobudur".replace(/[ou]/g, "a")  // Barabadar
+          ```
+        - Only with use of regular expressions can we replace multiple instances of the given string part that we want.
+    - Using matched groups to switch pairs of match groups
+        - ```js
+          // Behold, the true power of regular expressions
+          let lastFirst = "Liskov, Barbara" + "\n" + "McCarthy, John" + "\n" + "Wadler, Philip"
+          let firstLast = lastFirst.replace(/(\w+), (\w+)/g, "$2 $1")
+          // $2 and $1 are bindings of matched groups.
+          // $& can be used to refer to the whole
+          ```
+    - Using a predicate function over a string to process matched arguments
+        - ```js
+          "the cia and fbi".replace(/\b(cia|fbi)\b/, str => str.toUpperCase())  // the CIA and FBI
+          // str refers to the groups matched by the regular expression from the string
+          ```
+    - Using a more complicated predicate function
+        - ```js
+          // Our given string
+          let stock = "1 lemon, 2 cabbages, and 101 eggs"
+          // ("entire regex match", "group 1 match", "group 2 match")
+          function minusOne(match, amount, unit) {
+              amount -= 1  // process
+              if (amount == 0) amount = "no"  // replace with "no"
+              if (amount == 1) unit = unit.slice(0, unit.length - 1)  // remove plural suffix
+              return `${amount} ${unit}`
+          }
+          stock.replace(/(\d+) (\w+)/g, minusOne)  // "no lemon, 1 cabbage, and 100 eggs"
+          ```
 - ###### Greed
+    - We describe repetition operators ("+", "*", "?", and {}) to be greedy. This is because repetition operators will match as mange characters as possible before backtracking.
+    - To turn repetition operators and make them lazy, suffix them with a question mark ("+?", "*?", "??", "{}?"), causing repetition operators to match as least many characters as possible before backtracking.
+    - **This causes the regular expression to match more only if the least possible match is invalid**.
+    - A comment that strips comments out of code passed in as strings
+        - ```js
+          function stripComments(code) { return code.replace(/\/\/.*|\/\/*[^]*\*\//g), "") }
+          // [^] = "any character that isn't part of the empty set of characters"
+          // that symbol is used instead of periods because the latter do not match with new-line characters, however we still want to match with comment blocks
+          stripComments("1 + /* 2 */3")  // 1 + 3
+          stripComments("x + 1;// ten !")  // x + 1;
+          stripComments("1 /* a */+/* b */ 1")  // 1   1
+          // ^^ the engine is greedy by default, and thus first looked to match the entire string, thus matching the first /* with the second */, eliminating "+"
+          ```
+    - Fixing the previous regular expression by using lazy operators instead of greedy ones
+        - ```js
+          function stripComments(code) { return code.replace(/\/\/.*|\/\*[^]*?\*\//g, "") }
+          stripComments("1 /* a */+/* b */ 2")  // 1 + 1 <- here, both /* a */ and /* b */ are matched
+          ```
 - ###### Dynamically Creating `RegExp` Objects
+    - There are cases when you might not know the exact pattern you need to match against when writing your code.
+    - Dynamically matching with normal names
+        - ```js
+          let name = "Harry"
+          let text = "Harry is a suspicious character"
+          let regexp = new RegExp(`\\b(${name})\\b`, "gi")
+          // second argument contains arguments for regular expression. In this case, "gi" = "global and insensitive case"
+          // Remember to escape the slash that belongs to the bounding character when the regexp is expressed in a string.
+          text.replace(regexp, "_$1_")  // _Harry_ is a suspicious character
+          ```
+    - Dynamically matching with weird strings
+        - ```js
+          // This will consequentially nonsensically evaluate the regular expression it is passed into
+          name = "dea+hl[]rd"
+          // And so, we'll use backslashes to escape any special character in a given string of input
+          let nameEscaped = name.replace(/[\\[.+*?(){|^$]/g, "\\$&")
+          regexp = new RegExp(`\\b${nameEscaped}\\b`, "gi")
+          text = "This dea+hl[]rd guy is really annoying."
+          text.replace(regexp, "_$&_")  // "This _dea+hl[]rd_ guy is really annoying"
+          ```
 - ###### The Search Method
+    - The `indexOf()` method of strings cannot be used with regular expressions, and so we have an analog.
+    - The `search()` method returns the index of the first pattern matched by the expression, otherwise `-1` if not found
+    - Unlike `indexOf()` however we cannot indicate the starting index/offset to begin the search
+    - ```js
+      "  word".search(/\S/)  // 2 -> match what that isn't whitespace
+      "    ".search(/\S/)  // -1 -> it's all whitespace, so -1 is returned as no match is found
+      ```
 - ###### The `LastIndex` Property
+    - <i>"because confusion is an essential feature of JavaScript's regular-expression interface"</i>
+    - Similarly, the `exec()` method also does not provide a way to indicate the offset of the search.
+    - So, we're going to have to be inventive by using the properties of regular expression in JavaScript.
+        - `RegExp.source`: contains the string the expression was created from
+        - `RegExp.LastIndex`: controls, in limited circumstances, where the next match will start
+            - these limited circumstances are when the expression has the global "g" or sticky "y" option passed in.
+            - furthermore, the matching must happen with the `exec()` method and not other.
+    - Be careful of how sticky and global regular expressions work, global options in particular as well.
+        - Use the global property only when necessary:
+            - when replacing parts of strings matched by a given pattern with `String.replace(RegExp, String)`
+            - when explicitly using the `lastIndex` property to control the offset of where regex matching should begin in a given string.
+    - *Remeber that the `lastIndex` property requires the use of the `exec()` method and the global "g" option in the given regular expression.*
+    - The `lastIndex` property:
+        - ```js
+          // Matching for "y" with global option set
+          let pattern = /y/g
+          // It is a public property, so you can edit it if you want
+          pattern.lastIndex = 0
+          match = pattern.exec("xyzzy")
+          // The index at which the matched pattern occurred in the given string.
+          match.index == 4  // true
+          // Successful matches update the lastIndex property accordingly to after the character, else is set to 0
+          pattern.lastIndex == 5  // true
+          ```
+    - Demonstrating the difference between the global `g` and the sticky `y`:
+        - ```js
+          // Global searches for a match ahead of the lastIndex
+          let globalExp = /abc/g
+          globalExp.exp("xyz abc")  // ['abc', ...]
+          // Sticky will only match successfully for patterns occuring at the lastIndex
+          let stickyExp = /abc/y
+          stickyExp.exec("xyz abc")  // null
+          // Since the lastINdex starts at 0 upon construction, then a match will occur
+          stickyExp.exec("abc")  // ['abc', ...]
+          ```
+    - Demonstrating an effect of invoking the same global regular expression
+        - ```js
+          let digit = /\d/g
+          // lastIndex gets updated for the current match
+          digit.exec("here it is: 1")  // ['1']
+          // and thus, because it falls behind the lastIndex value
+          digit.exec("and now: 1")  // null
+          ```
+    - Demonstrating how the global option can change the way the `String.match()` works
+        - ```js
+          // The global option enables String.match(RegExp) to return an array consisting of all matched patterns
+          "Banana".match(/an/g)  // ['an', 'an']
+          ```
 - ###### Looping Over Matches
+    - *scanning through all of the occurrences of a pattern in a given string*
+    - Accessing the matched objects in a loop body
+        - ```js
+          let input = "A string with 3 numbers in it... 42 and 88."
+          let numberExp = /\b\d+\b/g
+          while (match = numberExp.exec(input)) console.log(`Found: ${match[0]} at index: ${match.index}`)
+          ```
 - ###### Parsing an INI File
+    - *a common problem for using regular expressions*
+    - The widely used format for the `.ini` file:
+        - Blank lines and lines starting with semicolons are ignored:
+        - Lines wrapped in `[` and `]` start a new section
+        - Lines containing an alphanumeric identifier followed by an `=` character add a setting to the current section
+        - Anything else is invalid
+    - Task: "convert a stringified .ini file into a JavaScript object"
+        - Split the file into separate lines.
+        - ```js
+          // Example function
+          function parseINI(ini) {
+              // Start with an object to hold the top-level fields
+              let result = {}, section = {}
+              ini.split(/\r?\n/).forEach(line => {
+                  let match
+                  if (match = line.match(/^(\w+)=(.*)$/)) section[match[1]] = match[2]
+                  else if (match = line.match(/^\[(.*)\]$/)) section = result[match[1]] = {}
+                  else if (!//) throw new Error (`Line '${line}' is not valid.`)
+              })
+          }
+          // Strings instantiated via back-ticks retain new lines
+          let file = `
+          name=Vasilis
+          [address]
+          city=Tessaloniki
+          [biology]
+          type=Human
+          `
+          // Print results
+          console.log(parseINI(file))
+          // {name: 'Vasilis', address: }
+          ```
 - ###### International Characters
-
+    - JavaScript/s regular expressions cannot support text outside of the English language due to JavaScript's simplistic implementations.
+    - A word `(\w)` may consist of the following:
+        - The 26 uppercase and lowercase characters of the Latin alphabet
+        - Decimal digits
+        - An underscore
+    - Any character that do not match within the aforementioned will match with `\W` instead.
+    - Whitespace `(\s)` however by strange historical accident do not have these limitations:
+        - Matches to any whitespace character defined by Unicode standard.
+        - Including the non-breaking space and the Mongolian vowel separator (what the).
+    - Further issues are caused by the fact that regular expressions work on code units, not the characters themselves that the code represents.
+        - This means that characters composed of two code units behave strangely.
+    - Demonstrating JavaScript's strange regex implementation:
+        - ```js
+          /b{3}/.test("bbb")  // true
+          /🍎{3}/.test("🍎🍎🍎")  // false
+          // ^^ 🍎 is treated as two code units, yet the {3} applies only to the second
+          /<.>/.test("<🌹>")  // false
+          // ^^ The dot matches for a single code unit, not the two that make up 🌹
+          /<.>/u.test("<🌹>")  // true
+          // ^^ adding the "u" option at the end (for "Unicode") will solve these problems
+          ```
+    - Using `\p` in regular expressions to solve international character problems:
+        - ```js
+          // Use the {Property=Value} notation to match any character that has the value for the given property, else {Name} notation assumes binary or categories
+          // You must have the "u" option enabled
+          /\p{Script=Greek}/u.test("α")  // true
+          /\p{Script=Arabic}/u.test("α")  // false
+          /\p{Alphabetic}/u.test("α")  // true
+          /\p{Alphabetic}/u.test("!")
+          ```
+- ###### Summary
+    - Regular expressions are objects that represent patterns in strings.
+        - They use their own language to represent these patterns.
+    - `/abc/`    = a sequence of the characters "abc"
+    - `/[abc]/`  = any character from the set of characters
+    - `/[^abc]/` = any character NOT from the set of characters
+    - `/[0-9]/`  = any character from the range of characters
+    - `/x+/`     = one or more characters of the pattern "x"
+    - `/x+?/`    = one or more characters (lazy)
+    - `/x*/`    = zero or more occurrences
+    - `/x?/`     = zero or one occurrence
+    - `/x{2,4}/` = two to four occurrences
+    - `/(abc)/`  = a group
+    - `/a|b|c/`  = any one of several patterns
+    - `/\d/`     = any digit character
+    - `/\w/`     = any alphanumeric "word" character (Latin script + underscore)
+    - `/\s/`     = any whitespace character (Unicode standard)
+    - `/./`      = any character except newlines
+    - `/\b/`     = a word boundary
+    - `/^/`      = start of input
+    - `/$/`      = end of input
+    - JavaScript implements particular regular expression methods:
+        - `RegExp.test(String)` -> returns true or false whether regex pattern is found in string
+        - `RegExp.exec(String)` -> returns an array containing all matched groups and some other properties
+        - `RegExp.exec(String).index` -> a property of aforementioned array that contains the index at which the pattern is found in the string
+    - JavaScript implements particular string methods that utilize regular expressions:
+        - `String.match(RegExp)` -> used to match against a regular expression
+        - `String.search(RegExp)` -> searches for a pattern
+        - `String.replace(RegExp, String)` -> replaces a portion of the string found by the regex pattern with another string
+    - Regular expressions have options which are written after the closing forward slash
+        - `i` -> make match-case insensitive
+        - `g` -> make expression global (causes `String.replace()` to replace all instances)
+        - `y` -> make expression sticky. Do not search ahead and skip part of the string when looking for a match
+        - `u` -> Unicode mode. Used for international character problems
+    - Regular expressions are both sharp and awkward tools. They can simplify a task and on the same token make complicated ones unmanageable.
+    - Resist the urge to shoehorn things that cannot cleanly express themselves
 ---
 ### Exercises
 - ######
