@@ -27,7 +27,7 @@ verify(/\w{6,}/,  // a word longer than six letters
        ["Siebentausenddreihundertzweiundzwanzig"],
        ["no", "three small words"]);
 
-verify(/([^eE])/g,  // a word without "e" or "E"
+verify(/\b([^eE ]+?)\b/g,  // a word without "e" or "E"
        ["red platypus", "wobbling nest"],
        ["earth bed", "learning ape", "BEET"]);
 
@@ -40,5 +40,9 @@ function verify(regexp, yes, no) {
 }
 
 /* Quoting Style */
+let text = "'I'm the cook,' he said, 'it's my job.'"
+// Change this call.
+console.log(text.replace(/(\b'|'\b)/g, "\""))
+// -> "I'm the cook", he said, "it's my job."
 
 /* Numbers Again */
