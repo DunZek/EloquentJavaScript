@@ -44,7 +44,7 @@
           ```
 - ###### Evaluating data as code
     - *to take control of loading dependencies by running string-data alongside the current program*
-    - Example: Using the `eval()` operator to execute strings within the current scope
+    - Using the `eval()` operator to execute strings within the current scope
         - ```js
           // Though this is bad practice as it breaks scoping standards and properties...
           const x = 2
@@ -56,7 +56,7 @@
           console.log(evalAndReturnX("var x = 2"))  // 2
           console.log(x)  // 1
           ```
-    - Example: Using the `function` constructor to interpret data as code
+    - Using the `function` constructor to interpret data as code
         - ```js
           // It takes two arguments:
           //    a string containing comma-separated arguments
@@ -73,12 +73,111 @@
             - `./` or `../` is generally interpreted as the chosen filename being relative to the current module's filename directory
             - When the name isn't relative, Node.js will look for an installed package by that name.
         - It is the functional essence of CommonJS.
-    - Example: Using two NPM modules to return date time
+    - Using two NPM modules to return date time
         - ```js
-          
+          // Exports an interface consisting of "ordinal()"; a single function
+          const ordinal = require('ordinal')  // Converts numbers to strings: 1 -> "1st", 2 -> "2nd", etc.
+          // Note: Overwriting "module.exports" will replace the empty interface object provided in order to export single values instead
+
+          // Exports an object containing multiple properties. Destructuring becomes convenient for creating bindings for exported interfaces
+          const {days, months} = require('date-names')  // returns names for weekdays and months. Exports formatDate(DateObject, String)
+
+          // Creating a function
+          exports.formatDate = function(date, format) {
+              return format.replace(/YYYY|M(MMM)?|Do?|dddd/g, tag => {
+                  if (tag == "YYYY") return date.getFullYear()
+                  if (tag == "M") return date.getMonth()
+                  if (tag == "MMMM") return months[date.getMonth()]
+                  if (tag == "D") return date.getDate()
+                  if (tag == "Do") return ordinal(date.getDate())  // invoke ordinal function from module
+                  if (tag == "dddd") return days[date.getDay()]
+              })
+          }
+          ```
+    - Interface functions get added to `exports` so that modules that depend on it get access to it
+        - ```js
+          const {formatDate} = require('./format-date')  // So, we can use the module like this:
+          formatDate(new Date(2017, 9, 13), "dddd the Do")  // Friday the 13th
+          exports.formatDate(new Date(2017, 9, 13), "dddd the Do")  // Friday the 13th
+          ```
+    - Implementation: `require()` in its most minimal form:
+        - ```js
+          require.cache = Object.create(null)  // reset cache: a storage containing already loaded modules
+          function require(name) {
+              // require() makes sure to see if the module isn't already loaded in.
+              if (!(name in require.cache)) {
+                  // A function that reads a file and returns its contents as a string
+                  let code = readFile(name)
+                  let module = {exports: {}}
+                  require.cache[name] = module
+                  let wrapper = Function(require, exports, module, code)
+                  wrapper(require, module.exports, module)
+              }
+              return require.cache[name].exports
+          }
+          ```
+    - Importing an INI file parser instead of writing our own:
+        - ```js
+          const {parse} = require('ini')
+          console.log(parse("x = 10\ny = 20"))  // {x: "10", y: "20"}
           ```
 - ###### EcmaScript Modules
+    - The combination of CommonJS modules and NPM have enabled the JavaScript community to be extensible.
+    - However, there are some problems that still remain:
+        - Things initialized in `exports` are not available in local scopes.
+        - It is hard to determine the dependencies of a module without running its code using `require()`
+    - The aforementioned issues pushed the 2015 standard of JavaScript to introduce its own, different module system: ES (ECMAScript) modules. The main concepts of dependencies and interfaces remain the same, however details differ:
+        - The notation is now integrated into the language.
+        - The `import` keyword now replaces having to call a function
+    - ES module interfaces are sets of name bindings.
+        - Importing modules results in those bindings being imported, not their values.
+        - These bindings may change values at any time.
+    - ES modules get imported before they run. Therefore,
+        - `import` declarations may not appear inside functions or blocks
+        - The names of dependencies must be quoted strings, not arbitrary expressions.
+    - Many projects now are written using ES modules and then automatically converted to some other format when published.
+    - A JavaScript developer is required to be able to use the two different module systems as they are used side-by-side.
+    - Accessing a dependency using ECMAScript 6 (JavaScript 2015):
+        - ```js
+          import ordinal from "ordinal"
+          import {days, months} from "date-names"
+          ```
+    - Using `export` before an expression:
+        - ```js
+          // The "default" keyword is a binding that makes it the main exported binding
+          export default ["Winter", "Spring", "Summer", "Autumn"]
+          // Note: alongside default, other bindings may still be exported
+          ```
+    - Renaming imported bindings using the keyword `as`:
+        - ```js
+          import {days as dayNames} from "date-names"
+          ```
 - ###### Building and bundling
+    - Many JavaScript projects aren't even technically written in JavaScript.
+    - Extensions are often planned to be used with language long before JavaScript is actually ran in platforms that support them. This is possible because present dialects of JavaScript are compiled into older and past versions so that old browsers can run it.
+    - Modular programs that consist of hundreds of files take too long to be loaded decently in web browsers.
+    - Because singular big files take much faster to load than multiple smaller ones, programmers have started using *bundlers*.
+    - **Bundlers** - tools that transform programs into big singular files before being published to the web.
+    - The sizes of files must also be taken to consideration. Thus, the JavaScript community invented *minifiers*.
+    - **Minifiers** - tools that reduce bundled JavaScript programs to the bare minimum file size by:
+        - removing comments and whitespace
+        - renaming bindings
+        - replacing pieces of code with equivalent code that takes up less space.
+    - Many NPM packages that run on web-pages have therefore then gone through multiple stages of transformation:
+        - conversion from modern JavaScript to historic JavaScript,
+        - conversion from using ES modules to Common JS modules,
+        - being bundled and then minified.
+    - So, be aware that the JavaScript code that gets run is often not the source code as it was written.
 - ###### Module design
-
+    - Program structuring is one of the subtler aspects of programming.
+    - There are trade-offs involved when trying to model the design of nontrivial pieces of functionality.
+    - Furthermore, the best way to learn the value of well-structured design is through experience:
+        - reading or working on a lot of programs
+        - noticing what works and what doesn't
+    - As a programmer, do not assume that painful messes are forever painful messes. The structure of almost everything can be improved by giving more thought into it.
+    - **Ease of use** - designing something for multiple people for long stretches of time that remain simple and predictable.
+- ###### Summary
 ### Exercises
+- ###### A Modular Robot
+- ###### Roads Module
+- ###### Circular dependencies

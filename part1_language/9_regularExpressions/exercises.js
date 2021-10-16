@@ -15,19 +15,19 @@ verify(/ferr(et|y|ari)/,  // "ferret", "ferry", and "ferrari"
        ["ferret", "ferry", "ferrari"],
        ["ferrum", "transfer A"]);
 
-verify(/\w+ious\b/,  // ending in "ious"
+verify(/ious\b/,  // ending in "ious"
        ["how delicious", "spacious room"],
        ["ruinous", "consciousness"]);
 
-verify(/\s(\.|,|:|;)/,  // whitespace character followed by a ".", ",", ":", or ";"
+verify(/\s[.,:;]/,  // whitespace character followed by a ".", ",", ":", or ";"
        ["bad punctuation ."],
        ["escape the period"]);
 
-verify(/\w{6,}/,  // a word longer than six letters
+verify(/\w{7}/,  // a word longer than six letters
        ["Siebentausenddreihundertzweiundzwanzig"],
        ["no", "three small words"]);
 
-verify(/\b([^eE ]+?)\b/g,  // a word without "e" or "E"
+verify(/\b[^\We]+\b/i,  // a word without "e" or "E"
        ["red platypus", "wobbling nest"],
        ["earth bed", "learning ape", "BEET"]);
 
