@@ -133,7 +133,13 @@
     - Filter to show only results with correlations greater than 0.1 or less than -0.1
     - Modify event to push the "peanut teeth" even when Jacques does not brush his teeth and also ate peanuts
 - ###### Further Arrayology
-    -
+    - Some useful array methods:
+        - ```js
+          let myList = []
+          myList.push("Item")
+          console.log(myList.shift())
+          function (task) { myList.push(task) }
+          ```
 - ###### Strings and their Properties
 - ###### Rest Parameters
 - ###### The Math Object

@@ -11,7 +11,7 @@ throughout the year. The book can be described as blunt introduction to programm
 
 The book is ordered in the manner that further and advanced JavaScript and programming topics can be taught by first establishing to the student the individual concepts that make them up.
 
-To return to:
+Unfinished:
 9. Regular Expressions (exercises)
 10. Modules
 
