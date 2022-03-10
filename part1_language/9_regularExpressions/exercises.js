@@ -3,46 +3,42 @@
 
 // Fill in the regular expressions
 
-verify(/ca[rt]/,  // "car" and "cat"
+verify(/ca[rt]/,  // car and cat
        ["my car", "bad cats"],
        ["camper", "high art"]);
 
-verify(/pr?op/,  // "pop" and "prop"
+verify(/pr?op/,  // pop and prop
        ["pop culture", "mad props"],
        ["plop", "prrrop"]);
 
-verify(/ferr(et|y|ari)/,  // "ferret", "ferry", and "ferrari"
+verify(/ferr(et|y|ari)/,  // ferret, ferry, and ferrari
        ["ferret", "ferry", "ferrari"],
        ["ferrum", "transfer A"]);
 
-verify(/ious\b/,  // ending in "ious"
+verify(/\w+ious\b/,  // Any word ending in ious
        ["how delicious", "spacious room"],
        ["ruinous", "consciousness"]);
 
-verify(/\s[.,:;]/,  // whitespace character followed by a ".", ",", ":", or ";"
+verify(/\s[.,:;]/,  // A whitespace character followed by a period, comma, colon, or semicolon
        ["bad punctuation ."],
        ["escape the period"]);
 
-verify(/\w{7}/,  // a word longer than six letters
+verify(/\w{6}/,  // A word longer than six letters
        ["Siebentausenddreihundertzweiundzwanzig"],
        ["no", "three small words"]);
 
-verify(/\b[^\We]+\b/i,  // a word without "e" or "E"
+verify(/\b[^eE]+\b/,  // A word without the letter e (or E)
        ["red platypus", "wobbling nest"],
        ["earth bed", "learning ape", "BEET"]);
 
 
 function verify(regexp, yes, no) {
-    // Ignore unfinished exercises
-    if (regexp.source == "...") return;
-    for (let str of yes) if (!regexp.test(str)) console.log(`Failure to match '${str}'`);
-    for (let str of no) if (regexp.test(str)) console.log(`Unexpected match for '${str}'`);
+  // Ignore unfinished exercises
+  if (regexp.source == "...") return;
+  for (let str of yes) if (!regexp.test(str)) {
+    console.log(`Failure to match '${str}'`);
+  }
+  for (let str of no) if (regexp.test(str)) {
+    console.log(`Unexpected match for '${str}'`);
+  }
 }
-
-/* Quoting Style */
-let text = "'I'm the cook,' he said, 'it's my job.'"
-// Change this call.
-console.log(text.replace(/(\b'|'\b)/g, "\""))
-// -> "I'm the cook", he said, "it's my job."
-
-/* Numbers Again */
